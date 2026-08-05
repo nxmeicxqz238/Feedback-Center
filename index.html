@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>เกม Air Hockey (Ultimate 3D Edition)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Prompt:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0; padding: 0;
+            background-color: #050510;
+            color: white;
+            font-family: 'Prompt', 'Orbitron', sans-serif;
+            overflow: hidden;
+        }
+        canvas {
+            display: block; width: 100vw; height: 100vh;
+            touch-action: none;
+            background-image: radial-gradient(circle at center, #111 0%, #000 100%);
+        }
+        /* UI สไตล์ Glassmorphism */
+        .controls-container, .settings-modal, .pause-modal {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(10, 10, 20, 0.75);
+            padding: 30px 40px; border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 210, 255, 0.3), inset 0 0 10px rgba(255, 51, 102, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            z-index: 10;
+            min-width: 550px;
+            box-sizing: border-box;
+        }
+        .settings-modal, .pause-modal { display: none; z-index: 20; min-width: 380px; }
+        
+        h2 { 
+            margin-top: 0; font-size: 32px; letter-spacing: 2px; 
+            background: linear-gradient(90deg, #ff3366, #00d2ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(255, 51, 102, 0.5);
+            font-family: 'Orbitron', sans-serif;
+        }
+        p { margin: 6px 0; font-size: 14px; line-height: 1.5; }
+        .highlight { color: #00d2ff; text-shadow: 0 0 10px #00d2ff; font-weight: bold; }
+        .highlight2 { color: #ff3366; text-shadow: 0 0 10px #ff3366; font-weight: bold; }
+        
+        .char-select-area, .settings-area, .option-group {
+            display: flex; justify-content: space-between;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px; border-radius: 15px;
+            margin: 20px 0; gap: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .settings-area { justify-content: center; text-align: center; }
+        .option-group { flex-direction: column; text-align: left; }
+        .option-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .option-row:last-child { margin-bottom: 0; }
+
+        select, input[type="range"] {
+            background: #111; color: white;
+            border: 1px solid #00d2ff; border-radius: 8px;
+            padding: 10px; font-size: 14px; outline: none; cursor: pointer;
+            font-family: 'Prompt', sans-serif;
+            transition: all 0.3s;
+        }
+        select { width: 100%; margin-top: 10px; }
+        select:hover, select:focus { box-shadow: 0 0 15px rgba(0, 210, 255, 0.5); }
+        
+        /* แก้ไขกลุ่มปุ่มให้จัดกึ่งกลางและปรับระยะห่าง */
+        .btn-group { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 15px; 
+            margin-top: 25px; 
+            width: 100%;
+        }
+        .btn-group-vertical { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+        
+        .btn {
+            padding: 15px 25px; font-size: 18px; font-weight: 800; color: white;
+            border: none; border-radius: 12px; cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-transform: uppercase; flex: 1; font-family: 'Prompt', sans-serif;
+            letter-spacing: 1px; max-width: 220px;
+        }
+        .btn-primary { 
+            background: linear-gradient(45deg, #ff3366, #00d2ff); 
+            box-shadow: 0 5px 25px rgba(255, 51, 102, 0.4); 
+        }
+        .btn-primary:hover { 
+            transform: translateY(-3px) scale(1.02); 
+            box-shadow: 0 10px 35px rgba(0, 210, 255, 0.6); 
+        }
+        .btn-secondary { background: rgba(50, 50, 60, 0.8); border: 1px solid #777; }
+        .btn-secondary:hover { background: rgba(80, 80, 90, 0.9); transform: translateY(-3px); }
+
+        #pauseBtn {
+            position: absolute; top: 20px; right: 20px;
+            padding: 10px 20px; font-size: 16px; font-weight: bold; font-family: 'Prompt', sans-serif;
+            color: white; background: rgba(20, 20, 30, 0.6);
+            border: 1px solid #00d2ff; border-radius: 10px; cursor: pointer;
+            z-index: 100; display: none; transition: 0.3s; backdrop-filter: blur(5px);
+            box-shadow: 0 0 10px rgba(0,210,255,0.3);
+            -webkit-tap-highlight-color: transparent;
+        }
+        #pauseBtn:hover { background: rgba(0, 210, 255, 0.8); box-shadow: 0 0 20px rgba(0, 210, 255, 0.6); }
+
+        /* UI ปุ่มกดอัลติเมท */
+        .ult-ui-btn {
+            position: absolute;
+            bottom: 50px;
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            background: rgba(10, 10, 20, 0.7);
+            border: 4px solid #555;
+            color: white;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 900;
+            cursor: pointer;
+            z-index: 100;
+            user-select: none;
+            backdrop-filter: blur(8px);
+            transition: transform 0.1s, border-color 0.3s, box-shadow 0.3s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .ult-ui-btn:active { transform: scale(0.9); }
+        .ult-ui-btn span { font-size: 16px; font-family: 'Prompt', sans-serif; font-weight: normal; margin-top: 4px; }
+        
+        #btnUltP1 { left: 40px; }
+        #btnUltP2 { right: 40px; }
+
+        .ult-ready {
+            animation: pulse-ult 0.8s infinite alternate;
+        }
+        @keyframes pulse-ult {
+            from { transform: scale(1); box-shadow: 0 0 15px rgba(255,255,255,0.3); }
+            to { transform: scale(1.15); box-shadow: 0 0 35px currentColor; border-width: 5px; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <button id="pauseBtn">⏸️ หยุดเกม</button>
+
+    <div id="btnUltP1" class="ult-ui-btn">
+        ULT 1
+        <span id="p1Gauge">0%</span>
+    </div>
+    <div id="btnUltP2" class="ult-ui-btn">
+        ULT 2
+        <span id="p2Gauge">0%</span>
+    </div>
+
+    <!-- Pause Modal -->
+    <div class="pause-modal" id="pauseModal">
+        <h2>⏸️ หยุดเกมชั่วคราว</h2>
+        <div class="btn-group-vertical">
+            <button class="btn btn-primary" id="resumeBtn" style="max-width: none;">▶ เล่นต่อ (Resume)</button>
+            <button class="btn btn-secondary" id="mainMenuBtn" style="max-width: none;">🏠 กลับเมนูหลัก</button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="settings-modal" id="settingsModal">
+        <h2>⚙️ ตั้งค่าระบบ</h2>
+        <div class="option-group">
+            <div class="option-row">
+                <span>🏆 แต้มชนะ:</span>
+                <select id="optWinScore" style="width: 140px; margin:0;">
+                    <option value="5">5 แต้ม</option>
+                    <option value="10" selected>10 แต้ม</option>
+                    <option value="15">15 แต้ม</option>
+                    <option value="20">20 แต้ม</option>
+                </select>
+            </div>
+            <div class="option-row">
+                <span>⚡ ความเร็วลูกฮอกกี้:</span>
+                <select id="optPuckSpeed" style="width: 140px; margin:0;">
+                    <option value="0.8">ช้าลง</option>
+                    <option value="1.0" selected>ปกติ</option>
+                    <option value="1.3">เร็วขึ้น</option>
+                </select>
+            </div>
+            <div class="option-row">
+                <span>🌑 เงาสมจริง (3D):</span>
+                <select id="optShadows" style="width: 140px; margin:0;">
+                    <option value="on" selected>เปิดใช้งาน</option>
+                    <option value="off">ปิด</option>
+                </select>
+            </div>
+            <div class="option-row">
+                <span>✨ ระดับกราฟิก:</span>
+                <select id="gfxSelect" style="width: 140px; margin:0;">
+                    <option value="high" selected>สูง (สวยงาม)</option>
+                    <option value="med">กลาง (สมดุล)</option>
+                    <option value="low">ต่ำ (เน้นลื่นไหล)</option>
+                </select>
+            </div>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-primary" id="saveSettingsBtn" style="max-width: none;">บันทึกและปิด</button>
+        </div>
+    </div>
+
+    <!-- Main Menu -->
+    <div class="controls-container" id="menuPanel">
+        <h2 style="font-family: 'Orbitron';">NEON HOCKEY</h2>
+        
+        <div class="char-select-area">
+            <div style="width: 48%; text-align: left;">
+                <span class="highlight">ผู้เล่นที่ 1 (P1)</span><br>
+                <small style="color:#aaa;">W,A,S,D | ไม้ตาย: E</small>
+                <select id="p1Char">
+                    <option value="inferno">🔥 อินเฟอร์โน (ลูกไฟประลัยกัลป์)</option>
+                    <option value="glacier">❄️ กลาเซียร์ (ลูกเตะแช่แข็ง)</option>
+                    <option value="shadow">👻 ชาโดว์ (ลูกบอลปีศาจ)</option>
+                    <option value="thunder">⚡ ธันเดอร์ (ความเร็วแสง)</option>
+                    <option value="venom">🐍 เวนอม (พิษสลับปุ่ม)</option>
+                    <option value="vampire">🦇 แวมไพร์ (สูบเกจไม้ตาย)</option>
+                    <option value="titan">🪨 ไททัน (ขยายร่างยักษ์)</option>
+                    <option value="sniper">🎯 สไนเปอร์ (ล็อกเป้าสั่งตาย)</option>
+                </select>
+            </div>
+            <div style="width: 48%; text-align: right;">
+                <span class="highlight2">ผู้เล่นที่ 2 (P2)</span><br>
+                <small style="color:#aaa;">ลูกศร | ไม้ตาย: Enter</small>
+                <select id="p2Char">
+                    <option value="inferno">🔥 อินเฟอร์โน (ลูกไฟประลัยกัลป์)</option>
+                    <option value="glacier" selected>❄️ กลาเซียร์ (ลูกเตะแช่แข็ง)</option>
+                    <option value="shadow">👻 ชาโดว์ (ลูกบอลปีศาจ)</option>
+                    <option value="thunder">⚡ ธันเดอร์ (ความเร็วแสง)</option>
+                    <option value="venom">🐍 เวนอม (พิษสลับปุ่ม)</option>
+                    <option value="vampire">🦇 แวมไพร์ (สูบเกจไม้ตาย)</option>
+                    <option value="titan">🪨 ไททัน (ขยายร่างยักษ์)</option>
+                    <option value="sniper">🎯 สไนเปอร์ (ล็อกเป้าสั่งตาย)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="settings-area">
+            <div style="width: 80%;">
+                <span style="color:#fff; font-weight:bold;">🌍 เลือกด่าน (MAP)</span>
+                <select id="mapSelect">
+                    <option value="neon">🟩 ด่านมาตรฐาน (Classic Neon)</option>
+                    <option value="cyber">🌐 โลกไซเบอร์ (Cyber Grid)</option>
+                    <option value="lava">🌋 ภูเขาไฟ (Lava Pit)</option>
+                    <option value="ice">❄️ ลานน้ำแข็ง (พื้นลื่นพิเศษ)</option>
+                    <option value="space">🌌 ห้วงอวกาศ (Cosmic Void)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- กลุ่มปุ่มเปิดการตั้งค่าและเริ่มเกม (จัดกึ่งกลางสนาม) -->
+        <div class="btn-group">
+            <button class="btn btn-secondary" id="openSettingsBtn">⚙️ ตั้งค่า</button>
+            <button class="btn btn-primary" id="startBtn">▶ เริ่มเกม</button>
+        </div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        
+        const menuPanel = document.getElementById("menuPanel");
+        const settingsModal = document.getElementById("settingsModal");
+        const pauseModal = document.getElementById("pauseModal");
+        
+        const startBtn = document.getElementById("startBtn");
+        const openSettingsBtn = document.getElementById("openSettingsBtn");
+        const saveSettingsBtn = document.getElementById("saveSettingsBtn");
+        
+        const pauseBtn = document.getElementById("pauseBtn");
+        const resumeBtn = document.getElementById("resumeBtn");
+        const mainMenuBtn = document.getElementById("mainMenuBtn");
+        
+        const btnUltP1 = document.getElementById("btnUltP1");
+        const btnUltP2 = document.getElementById("btnUltP2");
+        const p1Gauge = document.getElementById("p1Gauge");
+        const p2Gauge = document.getElementById("p2Gauge");
+        
+        const mapSelect = document.getElementById("mapSelect");
+        const p1CharSelect = document.getElementById("p1Char");
+        const p2CharSelect = document.getElementById("p2Char");
+
+        let isPlaying = false;
+        let isPaused = false;
+        let isGameOver = false;
+        let goalTop, goalBottom;
+        let shakeAmount = 0;
+        let particles = [];
+        let trails = [];
+        let fakePucks = [];
+        let screenMsg = { text: "", alpha: 0, scale: 1, color: "#fff" };
+        let rallyCount = 0; 
+        let lastHitter = 0;
+        let animationFrameId;
+        
+        let ultCutin = { active: false, text: "", color: "", timer: 0, player: 1 };
+
+        let WIN_SCORE = 10;
+        let speedMult = 1.0;
+        let enable3DShadows = true;
+        let gfxLevel = "high"; 
+        let currentMap = "neon";
+        let mapTime = 0;
+        let mapStars = [];
+
+        for(let i=0; i<150; i++) mapStars.push({ x: Math.random(), y: Math.random(), size: Math.random()*2+0.5, speed: Math.random()*0.3+0.1 });
+
+        const CHARACTERS = {
+            inferno: { color: "#ff4500", ultName: "🔥 ลูกไฟประลัยกัลป์!" },
+            glacier: { color: "#00bfff", ultName: "❄️ ลูกเตะแช่แข็ง!" },
+            shadow: { color: "#9370db", ultName: "👻 ลูกบอลปีศาจ!" },
+            thunder: { color: "#ffff00", ultName: "⚡ ความเร็วแสง!" },
+            venom: { color: "#32cd32", ultName: "🐍 พิษสลับปุ่ม!" },
+            vampire: { color: "#dc143c", ultName: "🦇 สูบพลังไม้ตาย!" },
+            titan: { color: "#ff8c00", ultName: "🪨 ขยายร่างไททัน!" },
+            sniper: { color: "#00ff7f", ultName: "🎯 สไนเปอร์ (ล็อกเป้าสั่งตาย)" }
+        };
+
+        const player1 = { 
+            x: 0, y: 0, radius: 0, baseRadius: 0, baseSpeed: 10, score: 0, coreColor: "#00d2ff", charColor: "#fff", char: 'inferno',
+            ult: 0, isUltReadyToHit: false, freezeTimer: 0, speedTimer: 0, slowTimer: 0, confuseTimer: 0, titanTimer: 0, bigTimer: 0, hasShield: false
+        };
+        const player2 = { 
+            x: 0, y: 0, radius: 0, baseRadius: 0, baseSpeed: 10, score: 0, coreColor: "#ff3366", charColor: "#fff", char: 'glacier',
+            ult: 0, isUltReadyToHit: false, freezeTimer: 0, speedTimer: 0, slowTimer: 0, confuseTimer: 0, titanTimer: 0, bigTimer: 0, hasShield: false
+        };
+        const puck = { 
+            x: 0, y: 0, radius: 0, dx: 0, dy: 0, friction: 0.99, baseHitForce: 12, 
+            color: "#ffffff", effect: null, invisTimer: 0, lastHit: 0, isSlowed: 0 
+        };
+        
+        let activeItem = null; let itemTimer = 0;
+        const keys = { w: false, a: false, s: false, d: false, ArrowUp: false, ArrowLeft: false, ArrowDown: false, ArrowRight: false };
+
+        function applyGlow(color, blur) {
+            if (gfxLevel === 'low') { ctx.shadowBlur = 0; } 
+            else if (gfxLevel === 'med') { ctx.shadowBlur = blur * 0.5; ctx.shadowColor = color; } 
+            else { ctx.shadowBlur = blur; ctx.shadowColor = color; }
+        }
+
+        function drawGloss(x, y, radius) {
+            if(gfxLevel === 'low') return;
+            ctx.beginPath();
+            ctx.arc(x, y - radius * 0.2, radius * 0.6, 0, Math.PI, true);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
+            ctx.fill();
+        }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            let goalHeight = canvas.height * 0.35; 
+            goalTop = (canvas.height - goalHeight) / 2; goalBottom = goalTop + goalHeight;
+            let baseSize = Math.min(canvas.width, canvas.height);
+            
+            player1.baseRadius = baseSize * 0.08; player1.radius = player1.baseRadius;
+            player2.baseRadius = baseSize * 0.08; player2.radius = player2.baseRadius;
+            puck.radius = baseSize * 0.035;
+            
+            if(!isPlaying) {
+                player1.x = canvas.width * 0.15; player1.y = canvas.height / 2;
+                player2.x = canvas.width * 0.85; player2.y = canvas.height / 2;
+                resetPuck();
+            }
+        }
+        window.addEventListener("resize", resizeCanvas);
+
+        window.addEventListener("keydown", (e) => {
+            if (e.code === "KeyW") keys.w = true; if (e.code === "KeyA") keys.a = true;
+            if (e.code === "KeyS") keys.s = true; if (e.code === "KeyD") keys.d = true;
+            if (e.code === "ArrowUp") keys.ArrowUp = true; if (e.code === "ArrowDown") keys.ArrowDown = true;
+            if (e.code === "ArrowLeft") keys.ArrowLeft = true; if (e.code === "ArrowRight") keys.ArrowRight = true;
+            if (e.code === "KeyE" && player1.ult >= 100 && isPlaying && !isPaused) activateUlt(player1);
+            if (e.code === "Enter" && player2.ult >= 100 && isPlaying && !isPaused) activateUlt(player2);
+            if (e.code === "Escape" && isPlaying) { 
+                if (isPaused) resumeGame(); 
+                else pauseGame(); 
+            }
+        });
+        window.addEventListener("keyup", (e) => {
+            if (e.code === "KeyW") keys.w = false; if (e.code === "KeyA") keys.a = false;
+            if (e.code === "KeyS") keys.s = false; if (e.code === "KeyD") keys.d = false;
+            if (e.code === "ArrowUp") keys.ArrowUp = false; if (e.code === "ArrowDown") keys.ArrowDown = false;
+            if (e.code === "ArrowLeft") keys.ArrowLeft = false; if (e.code === "ArrowRight") keys.ArrowRight = false;
+        });
+
+        btnUltP1.addEventListener('click', () => { if(player1.ult >= 100 && !isPaused) activateUlt(player1); });
+        btnUltP1.addEventListener('touchstart', (e) => { e.preventDefault(); if(player1.ult >= 100 && !isPaused) activateUlt(player1); });
+        
+        btnUltP2.addEventListener('click', () => { if(player2.ult >= 100 && !isPaused) activateUlt(player2); });
+        btnUltP2.addEventListener('touchstart', (e) => { e.preventDefault(); if(player2.ult >= 100 && !isPaused) activateUlt(player2); });
+
+        function handleTouch(e) {
+            if (!isPlaying || isPaused || isGameOver) return;
+            e.preventDefault(); 
+            let side1Center = canvas.width / 4; let side2Center = (canvas.width / 4) * 3;
+            let centerY = canvas.height / 2;
+
+            for (let i = 0; i < e.touches.length; i++) {
+                let touchX = e.touches[i].clientX; let touchY = e.touches[i].clientY;
+
+                if (touchX < canvas.width / 2) {
+                    if (player1.freezeTimer <= 0) {
+                        let px = touchX, py = touchY;
+                        if(player1.confuseTimer > 0) { px = side1Center - (touchX - side1Center); py = centerY - (touchY - centerY); }
+                        player1.x = Math.max(player1.radius, Math.min(px, canvas.width / 2 - player1.radius));
+                        player1.y = Math.max(player1.radius, Math.min(py, canvas.height - player1.radius));
+                    }
+                } else {
+                    if (player2.freezeTimer <= 0) {
+                        let px = touchX, py = touchY;
+                        if(player2.confuseTimer > 0) { px = side2Center - (touchX - side2Center); py = centerY - (touchY - centerY); }
+                        player2.x = Math.max(canvas.width / 2 + player2.radius, Math.min(px, canvas.width - player2.radius));
+                        player2.y = Math.max(player2.radius, Math.min(py, canvas.height - player2.radius));
+                    }
+                }
+            }
+        }
+        canvas.addEventListener("touchstart", handleTouch, { passive: false });
+        canvas.addEventListener("touchmove", handleTouch, { passive: false });
+
+        function activateUlt(player) {
+            player.isUltReadyToHit = true; 
+            player.ult = 0; 
+            shakeAmount = 15;
+            let charInfo = CHARACTERS[player.char];
+            
+            ultCutin.active = true;
+            ultCutin.player = player === player1 ? 1 : 2;
+            ultCutin.text = (player === player1 ? "P1: " : "P2: ") + charInfo.ultName;
+            ultCutin.color = charInfo.color;
+            ultCutin.timer = 80; 
+            
+            createParticles(player.x, player.y, charInfo.color, 50, 2);
+        }
+
+        function spawnItem() {
+            let types = ["BIG", "FREEZE", "SPEED", "SHIELD", "MIRAGE"];
+            let type = types[Math.floor(Math.random() * types.length)];
+            let colors = { "BIG": "#4CAF50", "FREEZE": "#00ffff", "SPEED": "#ffeb3b", "SHIELD": "#ff00ff", "MIRAGE": "#9d00ff" };
+            let icons = { "BIG": "🍄", "FREEZE": "❄️", "SPEED": "⚡", "SHIELD": "🛡️", "MIRAGE": "🔮" };
+            
+            activeItem = {
+                x: canvas.width/2 + (Math.random() * (canvas.width*0.4) - (canvas.width*0.2)),
+                y: canvas.height/2 + (Math.random() * (canvas.height*0.6) - (canvas.height*0.3)),
+                radius: canvas.width * 0.025, type: type, icon: icons[type], color: colors[type], life: 500
+            };
+            createParticles(activeItem.x, activeItem.y, activeItem.color, 30);
+        }
+
+        function applyItemEffect(type, playerNum) {
+            let target = playerNum === 1 ? player1 : player2;
+            let enemy = playerNum === 1 ? player2 : player1;
+            
+            if (type === "BIG") { 
+                target.radius = target.baseRadius * 1.5; target.bigTimer = 360; showMessage(`P${playerNum} ร่างยักษ์!`, target.charColor); 
+            } else if (type === "FREEZE") { 
+                enemy.freezeTimer = 90; showMessage(`P${playerNum === 1 ? 2 : 1} ถูกแช่แข็ง!`, "#00ffff"); createParticles(enemy.x, enemy.y, "#00ffff", 40); 
+            } else if (type === "SPEED") { 
+                target.speedTimer = 300; showMessage(`P${playerNum} ความเร็วพุ่ง!`, "#ffeb3b"); createParticles(target.x, target.y, "#ffeb3b", 40); 
+            } else if (type === "SHIELD") {
+                target.hasShield = true; showMessage(`P${playerNum} ได้รับโล่!`, "#ff00ff");
+            } else if (type === "MIRAGE") {
+                showMessage("แยกร่างเงา!", "#9d00ff");
+                for(let i=0; i<2; i++) {
+                    fakePucks.push({
+                        x: puck.x, y: puck.y,
+                        dx: (Math.random() > 0.5 ? 1 : -1) * (15 + Math.random()*10),
+                        dy: (Math.random() - 0.5) * 20,
+                        life: 300
+                    });
+                }
+            }
+            activeItem = null;
+        }
+
+        function createParticles(x, y, color, count=15, speedMultiplier=1) {
+            if(gfxLevel === 'low') return;
+            if(gfxLevel === 'med') count = Math.ceil(count / 2);
+            for(let i=0; i<count; i++){
+                particles.push({
+                    x: x, y: y, dx: (Math.random() - 0.5) * 10 * speedMultiplier, dy: (Math.random() - 0.5) * 10 * speedMultiplier,
+                    life: 1.0, decay: Math.random() * 0.05 + 0.02, color: color, size: Math.random() * 5 + 2
+                });
+            }
+        }
+
+        function showMessage(text, color) { shakeAmount = 15; screenMsg = { text: text, color: color, alpha: 1.2, scale: 0.5 }; }
+
+        function resetPuck() {
+            puck.x = canvas.width / 2; puck.y = canvas.height / 2;
+            puck.dx = 0; puck.dy = 0; puck.baseHitForce = 12 * speedMult; 
+            puck.effect = null; puck.invisTimer = 0; puck.lastHit = 0; puck.isSlowed = 0; trails = [];
+            rallyCount = 0; lastHitter = 0; fakePucks = [];
+            setTimeout(()=>{ if(isPlaying && !isPaused && puck.dx===0) { puck.dx = Math.random()>0.5?3:-3; puck.dy = Math.random()>0.5?3:-3; } }, 1000);
+        }
+
+        function pauseGame() {
+            if (!isPlaying || isGameOver) return;
+            isPaused = true;
+            pauseModal.style.display = "block";
+        }
+
+        function resumeGame() {
+            isPaused = false;
+            pauseModal.style.display = "none";
+        }
+
+        function showMenu() {
+            isPlaying = false;
+            isPaused = false;
+            pauseModal.style.display = "none";
+            menuPanel.style.display = "block";
+            pauseBtn.style.display = "none";
+            btnUltP1.style.display = "none";
+            btnUltP2.style.display = "none";
+        }
+
+        function resetGameToMenu() {
+            isPlaying = false; isGameOver = false; isPaused = false;
+            player1.score = 0; player2.score = 0;
+            player1.ult = 0; player2.ult = 0;
+            player1.radius = player1.baseRadius; player2.radius = player2.baseRadius;
+            player1.isUltReadyToHit = false; player2.isUltReadyToHit = false;
+            player1.hasShield = false; player2.hasShield = false;
+            player1.freezeTimer = 0; player1.speedTimer = 0; player1.slowTimer = 0; player1.confuseTimer = 0; player1.titanTimer = 0; player1.bigTimer = 0;
+            player2.freezeTimer = 0; player2.speedTimer = 0; player2.slowTimer = 0; player2.confuseTimer = 0; player2.titanTimer = 0; player2.bigTimer = 0;
+            activeItem = null; particles = []; trails = []; fakePucks = []; ultCutin.timer = 0;
+            
+            showMenu();
+            resetPuck();
+        }
+
+        function onGoal(playerScored) {
+            shakeAmount = 20;
+            createParticles(puck.x, puck.y, playerScored === 1 ? player1.charColor : player2.charColor, 100, 3);
+            showMessage(`ได้ประตู! ผู้เล่น ${playerScored}`, playerScored === 1 ? player1.charColor : player2.charColor);
+            
+            if (player1.score >= WIN_SCORE) { 
+                isGameOver = true; 
+                setTimeout(()=>showMessage("🏆 ผู้เล่น 1 ชนะ! 🏆", player1.charColor), 1500); 
+                setTimeout(resetGameToMenu, 5000); 
+            } else if (player2.score >= WIN_SCORE) { 
+                isGameOver = true; 
+                setTimeout(()=>showMessage("🏆 ผู้เล่น 2 ชนะ! 🏆", player2.charColor), 1500); 
+                setTimeout(resetGameToMenu, 5000); 
+            } else {
+                setTimeout(resetPuck, 1500);
+                puck.x = -1000; puck.y = -1000; puck.dx = 0; puck.dy = 0; 
+            }
+        }
+
+        function checkPlayerCollision(striker, p, playerNum) {
+            let dx = p.x - striker.x; let dy = p.y - striker.y;
+            let distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < striker.radius + p.radius) {
+                let nx = dx / distance; let ny = dy / distance;
+                p.x = striker.x + nx * (striker.radius + p.radius + 1);
+                p.y = striker.y + ny * (striker.radius + p.radius + 1);
+                p.lastHit = playerNum;
+                
+                if(lastHitter !== playerNum && lastHitter !== 0) {
+                    rallyCount++;
+                    if(rallyCount % 5 === 0) {
+                        showMessage(`🔥 ตีโต้ ${rallyCount} ครั้ง! 🔥`, "#ff8c00");
+                        speedMult = Math.min(2.0, speedMult + 0.1); 
+                    }
+                }
+                lastHitter = playerNum;
+
+                let enemy = playerNum === 1 ? player2 : player1;
+
+                if (striker.isUltReadyToHit) {
+                    striker.isUltReadyToHit = false; let charType = striker.char; p.effect = charType;
+                    
+                    if (charType === 'inferno') { p.dx = nx * 50; p.dy = ny * 50; shakeAmount = 25; createParticles(p.x, p.y, CHARACTERS.inferno.color, 50, 2); } 
+                    else if (charType === 'glacier') { p.dx = nx * 3; p.dy = ny * 3; p.isSlowed = 150; shakeAmount = 10; showMessage("เชื่องช้า!", CHARACTERS.glacier.color); createParticles(p.x, p.y, CHARACTERS.glacier.color, 50, 2); } 
+                    else if (charType === 'shadow') { p.dx = nx * 40; p.dy = ny * 40; p.invisTimer = 90; shakeAmount = 15; createParticles(p.x, p.y, CHARACTERS.shadow.color, 50, 2); } 
+                    else if (charType === 'thunder') { p.dx = nx * 80; p.dy = ny * 80; shakeAmount = 15; createParticles(p.x, p.y, CHARACTERS.thunder.color, 60, 3); } 
+                    else if (charType === 'venom') { p.dx = nx * 35; p.dy = ny * 35; enemy.confuseTimer = 180; shakeAmount = 15; showMessage("สับสน!", CHARACTERS.venom.color); createParticles(enemy.x, enemy.y, CHARACTERS.venom.color, 50, 2); } 
+                    else if (charType === 'vampire') { p.dx = nx * 35; p.dy = ny * 35; let stolen = Math.min(enemy.ult, 50); enemy.ult -= stolen; striker.ult = Math.min(100, striker.ult + stolen); shakeAmount = 15; showMessage("ขโมยพลัง!", CHARACTERS.vampire.color); createParticles(striker.x, striker.y, CHARACTERS.vampire.color, 50, 2); } 
+                    else if (charType === 'titan') { p.dx = nx * 35; p.dy = ny * 35; striker.radius = striker.baseRadius * 1.8; striker.titanTimer = 240; shakeAmount = 25; showMessage("ขยายร่าง!", CHARACTERS.titan.color); createParticles(striker.x, striker.y, CHARACTERS.titan.color, 60, 2); } 
+                    else if (charType === 'sniper') { let targetX = playerNum === 1 ? canvas.width : 0; let targetY = canvas.height / 2; let sdx = targetX - p.x; let sdy = targetY - p.y; let sdist = Math.sqrt(sdx*sdx + sdy*sdy); p.dx = (sdx / sdist) * 45; p.dy = (sdy / sdist) * 45; shakeAmount = 15; showMessage("ล็อกเป้า!", CHARACTERS.sniper.color); createParticles(p.x, p.y, CHARACTERS.sniper.color, 50, 2); }
+                } else {
+                    p.effect = null; p.isSlowed = 0; p.baseHitForce = Math.min(25 * speedMult, p.baseHitForce * 1.05); 
+                    p.dx = nx * p.baseHitForce; p.dy = ny * p.baseHitForce;
+                    createParticles(p.x, p.y, striker.charColor, 10); 
+                    shakeAmount = 3; if (striker.ult < 100) striker.ult = Math.min(100, striker.ult + 7); 
+                }
+            }
+        }
+
+        function updateUltUI() {
+            p1Gauge.innerText = Math.floor(player1.ult) + '%';
+            if (player1.ult >= 100) {
+                btnUltP1.classList.add('ult-ready');
+                btnUltP1.style.color = CHARACTERS[player1.char].color;
+                btnUltP1.style.borderColor = CHARACTERS[player1.char].color;
+            } else {
+                btnUltP1.classList.remove('ult-ready');
+                btnUltP1.style.color = 'white';
+                btnUltP1.style.borderColor = '#555';
+            }
+
+            p2Gauge.innerText = Math.floor(player2.ult) + '%';
+            if (player2.ult >= 100) {
+                btnUltP2.classList.add('ult-ready');
+                btnUltP2.style.color = CHARACTERS[player2.char].color;
+                btnUltP2.style.borderColor = CHARACTERS[player2.char].color;
+            } else {
+                btnUltP2.classList.remove('ult-ready');
+                btnUltP2.style.color = 'white';
+                btnUltP2.style.borderColor = '#555';
+            }
+        }
+
+        function update() {
+            if (!isPlaying || isPaused) return; 
+            if (shakeAmount > 0) { shakeAmount *= 0.85; if (shakeAmount < 0.5) shakeAmount = 0; }
+            if (screenMsg.alpha > 0) { screenMsg.alpha -= 0.015; screenMsg.scale += 0.03; }
+            mapTime += 1;
+            
+            updateUltUI();
+
+            if (isGameOver) return; 
+
+            if(player1.freezeTimer > 0) player1.freezeTimer--; if(player1.speedTimer > 0) player1.speedTimer--;
+            if(player1.slowTimer > 0) player1.slowTimer--; if(player1.confuseTimer > 0) player1.confuseTimer--;
+            if(player1.titanTimer > 0) { player1.titanTimer--; if(player1.titanTimer === 0 && player1.bigTimer <= 0) player1.radius = player1.baseRadius; }
+            if(player1.bigTimer > 0) { player1.bigTimer--; if(player1.bigTimer === 0 && player1.titanTimer <= 0) player1.radius = player1.baseRadius; }
+            
+            if(player2.freezeTimer > 0) player2.freezeTimer--; if(player2.speedTimer > 0) player2.speedTimer--;
+            if(player2.slowTimer > 0) player2.slowTimer--; if(player2.confuseTimer > 0) player2.confuseTimer--;
+            if(player2.titanTimer > 0) { player2.titanTimer--; if(player2.titanTimer === 0 && player2.bigTimer <= 0) player2.radius = player2.baseRadius; }
+            if(player2.bigTimer > 0) { player2.bigTimer--; if(player2.bigTimer === 0 && player2.titanTimer <= 0) player2.radius = player2.baseRadius; }
+            
+            if(puck.invisTimer > 0) puck.invisTimer--; if(puck.isSlowed > 0) puck.isSlowed--;
+
+            itemTimer++;
+            if(!activeItem && itemTimer > 350 && Math.random() < 0.03) { spawnItem(); itemTimer = 0; }
+            if(activeItem) {
+                activeItem.life--;
+                if(activeItem.life <= 0) activeItem = null;
+                else {
+                    let dx = puck.x - activeItem.x; let dy = puck.y - activeItem.y;
+                    if(Math.sqrt(dx*dx + dy*dy) < puck.radius + activeItem.radius) {
+                        if(puck.lastHit !== 0) applyItemEffect(activeItem.type, puck.lastHit);
+                        else activeItem = null;
+                    }
+                }
+            }
+
+            if (ultCutin.active) {
+                ultCutin.timer--;
+                if(ultCutin.timer <= 0) ultCutin.active = false;
+            }
+
+            let p1Speed = player1.baseSpeed * (player1.speedTimer > 0 ? 1.5 : 1) * (player1.slowTimer > 0 ? 0.5 : 1);
+            if(player1.freezeTimer <= 0) {
+                let moveW = keys.w, moveA = keys.a, moveS = keys.s, moveD = keys.d;
+                if(player1.confuseTimer > 0) { moveW = keys.s; moveS = keys.w; moveA = keys.d; moveD = keys.a; }
+                if(moveW && player1.y > player1.radius) player1.y -= p1Speed;
+                if(moveS && player1.y < canvas.height - player1.radius) player1.y += p1Speed;
+                if(moveA && player1.x > player1.radius) player1.x -= p1Speed;
+                if(moveD && player1.x < canvas.width/2 - player1.radius) player1.x += p1Speed;
+            }
+
+            let p2Speed = player2.baseSpeed * (player2.speedTimer > 0 ? 1.5 : 1) * (player2.slowTimer > 0 ? 0.5 : 1);
+            if(player2.freezeTimer <= 0) {
+                let moveUp = keys.ArrowUp, moveDown = keys.ArrowDown, moveLeft = keys.ArrowLeft, moveRight = keys.ArrowRight;
+                if(player2.confuseTimer > 0) { moveUp = keys.ArrowDown; moveDown = keys.ArrowUp; moveLeft = keys.ArrowRight; moveRight = keys.ArrowLeft; }
+                if(moveUp && player2.y > player2.radius) player2.y -= p2Speed;
+                if(moveDown && player2.y < canvas.height - player2.radius) player2.y += p2Speed;
+                if(moveLeft && player2.x > canvas.width/2 + player2.radius) player2.x -= p2Speed;
+                if(moveRight && player2.x < canvas.width - player2.radius) player2.x += p2Speed;
+            }
+
+            if (currentMap === 'ice') puck.friction = 0.998;
+            else puck.friction = 0.99;
+            
+            if (puck.isSlowed > 0) { puck.dx *= 0.95; puck.dy *= 0.95; }
+            else { puck.dx *= puck.friction; puck.dy *= puck.friction; }
+            
+            puck.x += puck.dx; puck.y += puck.dy;
+            
+            if(Math.abs(puck.dx) > 2 || Math.abs(puck.dy) > 2) {
+                trails.push({x: puck.x, y: puck.y, life: 1.0, color: puck.effect ? CHARACTERS[puck.effect].color : puck.color});
+                if(trails.length > 25) trails.shift();
+            } else if(trails.length > 0) { trails.shift(); }
+            for(let t of trails) t.life -= 0.05;
+            trails = trails.filter(t => t.life > 0);
+
+            if(puck.y - puck.radius < 0) { puck.y = puck.radius; puck.dy *= -1; createParticles(puck.x, puck.y, "#fff", 5); }
+            if(puck.y + puck.radius > canvas.height) { puck.y = canvas.height - puck.radius; puck.dy *= -1; createParticles(puck.x, puck.y, "#fff", 5); }
+            
+            if(puck.x - puck.radius < 0) {
+                if(puck.y > goalTop && puck.y < goalBottom) { player2.score++; onGoal(2); }
+                else { puck.x = puck.radius; puck.dx *= -1; createParticles(puck.x, puck.y, "#fff", 5); }
+            }
+            if(puck.x + puck.radius > canvas.width) {
+                if(puck.y > goalTop && puck.y < goalBottom) { player1.score++; onGoal(1); }
+                else { puck.x = canvas.width - puck.radius; puck.dx *= -1; createParticles(puck.x, puck.y, "#fff", 5); }
+            }
+
+            checkPlayerCollision(player1, puck, 1);
+            checkPlayerCollision(player2, puck, 2);
+
+            for(let i=fakePucks.length-1; i>=0; i--) {
+                let fp = fakePucks[i];
+                fp.x += fp.dx; fp.y += fp.dy;
+                fp.life--;
+                if(fp.y - puck.radius < 0 || fp.y + puck.radius > canvas.height) fp.dy *= -1;
+                if(fp.x - puck.radius < 0 || fp.x + puck.radius > canvas.width) fp.dx *= -1;
+                if(fp.life <= 0) fakePucks.splice(i, 1);
+            }
+
+            for(let i=particles.length-1; i>=0; i--){
+                let p = particles[i];
+                p.x += p.dx; p.y += p.dy; p.life -= p.decay;
+                if(p.life <= 0) particles.splice(i,1);
+            }
+        }
+
+        function drawMapEffect() {
+            if(currentMap === 'cyber') {
+                ctx.strokeStyle = "rgba(0, 255, 255, 0.1)";
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                let gridSize = 50;
+                for(let x=(mapTime%gridSize); x<canvas.width; x+=gridSize) { ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); }
+                for(let y=(mapTime%gridSize); y<canvas.height; y+=gridSize) { ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); }
+                ctx.stroke();
+            } else if (currentMap === 'space') {
+                ctx.fillStyle = "#fff";
+                for(let star of mapStars) {
+                    star.x -= star.speed;
+                    if(star.x < 0) { star.x = 1; star.y = Math.random(); }
+                    ctx.beginPath();
+                    ctx.arc(star.x * canvas.width, star.y * canvas.height, star.size, 0, Math.PI*2);
+                    ctx.fill();
+                }
+            } else if (currentMap === 'lava') {
+                ctx.fillStyle = "rgba(255, 50, 0, 0.05)";
+                ctx.fillRect(0, 0, canvas.width, 20);
+                ctx.fillRect(0, canvas.height-20, canvas.width, 20);
+            } else if (currentMap === 'ice') {
+                ctx.fillStyle = "rgba(150, 200, 255, 0.03)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        function drawPlayer(p) {
+            if(enable3DShadows && gfxLevel !== 'low') {
+                ctx.beginPath();
+                ctx.ellipse(p.x + p.radius*0.3, p.y + p.radius*0.3, p.radius, p.radius*0.7, 0, 0, Math.PI*2);
+                ctx.fillStyle = "rgba(0,0,0,0.5)";
+                ctx.fill();
+            }
+            
+            if(p.isUltReadyToHit) { applyGlow(p.charColor, 30); } 
+            else { applyGlow(p.coreColor, 15); }
+            
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI*2);
+            ctx.fillStyle = p.isUltReadyToHit ? p.charColor : "#111";
+            ctx.fill();
+            ctx.lineWidth = p.isUltReadyToHit ? 8 : 4;
+            ctx.strokeStyle = p.charColor;
+            ctx.stroke();
+            
+            applyGlow("transparent", 0);
+            
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius * 0.5, 0, Math.PI*2);
+            ctx.strokeStyle = p.coreColor;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            drawGloss(p.x, p.y, p.radius);
+
+            if(p.freezeTimer > 0) {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius * 1.2, 0, Math.PI*2);
+                ctx.fillStyle = "rgba(0, 255, 255, 0.4)";
+                ctx.fill();
+            }
+            if(p.hasShield) {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius * 1.3, 0, Math.PI*2);
+                ctx.strokeStyle = "#ff00ff";
+                ctx.lineWidth = 3;
+                ctx.stroke();
+            }
+        }
+
+        function drawPuck() {
+            if(puck.invisTimer > 0) return;
+
+            if(enable3DShadows && gfxLevel !== 'low') {
+                ctx.beginPath();
+                ctx.arc(puck.x + puck.radius*0.3, puck.y + puck.radius*0.3, puck.radius, 0, Math.PI*2);
+                ctx.fillStyle = "rgba(0,0,0,0.5)";
+                ctx.fill();
+            }
+
+            let displayColor = puck.effect ? CHARACTERS[puck.effect].color : puck.color;
+            applyGlow(displayColor, 20);
+            ctx.beginPath();
+            ctx.arc(puck.x, puck.y, puck.radius, 0, Math.PI*2);
+            ctx.fillStyle = "#fff";
+            ctx.fill();
+            
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = displayColor;
+            ctx.stroke();
+            
+            applyGlow("transparent", 0);
+            drawGloss(puck.x, puck.y, puck.radius);
+        }
+
+        function draw() {
+            if(!isPlaying) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            let offsetX = (Math.random() - 0.5) * shakeAmount;
+            let offsetY = (Math.random() - 0.5) * shakeAmount;
+            ctx.save();
+            ctx.translate(offsetX, offsetY);
+
+            drawMapEffect();
+            applyGlow("#fff", 15);
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, 0);
+            ctx.lineTo(canvas.width / 2, canvas.height);
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+            ctx.lineWidth = 4;
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, canvas.height / 2, canvas.height * 0.15, 0, Math.PI*2);
+            ctx.stroke();
+            applyGlow("transparent", 0);
+
+            applyGlow(player1.coreColor, 20);
+            ctx.fillStyle = "rgba(0, 210, 255, 0.2)";
+            ctx.fillRect(0, goalTop, 15, goalBottom - goalTop);
+            ctx.strokeStyle = player1.coreColor;
+            ctx.lineWidth = 5;
+            ctx.strokeRect(0, goalTop, 15, goalBottom - goalTop);
+
+            applyGlow(player2.coreColor, 20);
+            ctx.fillStyle = "rgba(255, 51, 102, 0.2)";
+            ctx.fillRect(canvas.width - 15, goalTop, 15, goalBottom - goalTop);
+            ctx.strokeStyle = player2.coreColor;
+            ctx.strokeRect(canvas.width - 15, goalTop, 15, goalBottom - goalTop);
+            applyGlow("transparent", 0);
+
+            if (gfxLevel !== 'low') {
+                for (let i=0; i<trails.length; i++) {
+                    let t = trails[i];
+                    ctx.beginPath();
+                    ctx.arc(t.x, t.y, puck.radius * t.life, 0, Math.PI*2);
+                    ctx.fillStyle = t.color;
+                    ctx.globalAlpha = t.life * 0.5;
+                    ctx.fill();
+                }
+                ctx.globalAlpha = 1.0;
+            }
+
+            if(activeItem) {
+                applyGlow(activeItem.color, 15);
+                ctx.beginPath();
+                ctx.arc(activeItem.x, activeItem.y, activeItem.radius, 0, Math.PI*2);
+                ctx.fillStyle = "rgba(0,0,0,0.5)";
+                ctx.fill();
+                ctx.lineWidth = 3; ctx.strokeStyle = activeItem.color; ctx.stroke();
+                
+                ctx.font = `${activeItem.radius}px sans-serif`;
+                ctx.textAlign = "center"; ctx.textBaseline = "middle";
+                ctx.fillStyle = "#fff";
+                ctx.fillText(activeItem.icon, activeItem.x, activeItem.y);
+                applyGlow("transparent", 0);
+            }
+
+            for(let fp of fakePucks) {
+                ctx.globalAlpha = Math.min(1.0, fp.life / 100);
+                ctx.beginPath();
+                ctx.arc(fp.x, fp.y, puck.radius, 0, Math.PI*2);
+                ctx.fillStyle = "#fff"; ctx.fill();
+                ctx.strokeStyle = CHARACTERS['shadow'].color; ctx.lineWidth=3; ctx.stroke();
+            }
+            ctx.globalAlpha = 1.0;
+
+            drawPlayer(player1);
+            drawPlayer(player2);
+            drawPuck();
+
+            if (gfxLevel !== 'low') {
+                for (let p of particles) {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+                    ctx.fillStyle = p.color;
+                    ctx.globalAlpha = p.life;
+                    ctx.fill();
+                }
+                ctx.globalAlpha = 1.0;
+            }
+
+            ctx.font = "bold 80px Orbitron";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "top";
+            
+            applyGlow(player1.coreColor, 15);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+            ctx.fillText(player1.score, canvas.width / 4, 30);
+            
+            applyGlow(player2.coreColor, 15);
+            ctx.fillText(player2.score, (canvas.width / 4) * 3, 30);
+            applyGlow("transparent", 0);
+
+            if (screenMsg.alpha > 0) {
+                ctx.save();
+                ctx.translate(canvas.width/2, canvas.height/2);
+                ctx.scale(screenMsg.scale, screenMsg.scale);
+                ctx.font = "bold 60px Prompt";
+                ctx.textAlign = "center"; ctx.textBaseline = "middle";
+                applyGlow(screenMsg.color, 20);
+                ctx.fillStyle = `rgba(255, 255, 255, ${screenMsg.alpha})`;
+                ctx.fillText(screenMsg.text, 0, 0);
+                
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = screenMsg.color;
+                ctx.globalAlpha = screenMsg.alpha;
+                ctx.strokeText(screenMsg.text, 0, 0);
+                ctx.restore();
+                applyGlow("transparent", 0);
+            }
+
+            if (ultCutin.active) {
+                let cutinWidth = canvas.width;
+                let cutinHeight = 120;
+                let yPos = (canvas.height / 2) - (cutinHeight/2);
+                
+                ctx.save();
+                ctx.fillStyle = ultCutin.color;
+                ctx.globalAlpha = (ultCutin.timer > 20) ? 0.8 : (ultCutin.timer / 20) * 0.8;
+                ctx.transform(1, 0, -0.2, 1, 0, 0);
+                ctx.fillRect(0, yPos, cutinWidth + 200, cutinHeight);
+                
+                ctx.transform(1, 0, 0.2, 1, 0, 0);
+                ctx.globalAlpha = (ultCutin.timer > 20) ? 1.0 : (ultCutin.timer / 20);
+                ctx.font = "bold 50px Prompt";
+                ctx.fillStyle = "#fff";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.shadowColor = "#000"; ctx.shadowBlur = 10;
+                let xOffset = ultCutin.player === 1 ? (80 - ultCutin.timer)*15 : (ultCutin.timer - 80)*15;
+                ctx.fillText(ultCutin.text, (canvas.width/2) + xOffset, canvas.height/2);
+                
+                ctx.restore();
+            }
+
+            ctx.restore();
+        }
+
+        function loop() {
+            update();
+            draw();
+            animationFrameId = requestAnimationFrame(loop);
+        }
+
+        startBtn.addEventListener("click", () => {
+            menuPanel.style.display = "none";
+            pauseBtn.style.display = "block";
+            btnUltP1.style.display = "flex";
+            btnUltP2.style.display = "flex";
+            
+            WIN_SCORE = parseInt(document.getElementById("optWinScore").value);
+            speedMult = parseFloat(document.getElementById("optPuckSpeed").value);
+            enable3DShadows = document.getElementById("optShadows").value === "on";
+            gfxLevel = document.getElementById("gfxSelect").value;
+            currentMap = document.getElementById("mapSelect").value;
+
+            player1.char = p1CharSelect.value;
+            player1.charColor = CHARACTERS[player1.char].color;
+            player2.char = p2CharSelect.value;
+            player2.charColor = CHARACTERS[player2.char].color;
+
+            resizeCanvas();
+            isPlaying = true;
+            isPaused = false;
+            if(!animationFrameId) loop();
+        });
+
+        openSettingsBtn.addEventListener("click", () => { settingsModal.style.display = "block"; });
+        saveSettingsBtn.addEventListener("click", () => { settingsModal.style.display = "none"; });
+        
+        pauseBtn.addEventListener("click", pauseGame);
+        resumeBtn.addEventListener("click", resumeGame);
+        mainMenuBtn.addEventListener("click", resetGameToMenu);
+
+        resizeCanvas();
+    </script>
+</body>
+</html>
