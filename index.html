@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบรับเรื่องร้องเรียนและร้องทุกข์ออนไลน์ | E-Complaint System</title>
+    <title data-i18n="app_title">ระบบแจ้งเรื่องร้องเรียนระดับองค์กร | มหาวิทยาลัยราชภัฏเลย</title>
     <!-- Google Fonts: Prompt -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -15,20 +15,11 @@
     
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
                         sans: ['Prompt', 'sans-serif'],
-                    },
-                    colors: {
-                        navy: {
-                            50: '#f0f4f8',
-                            100: '#d9e2ec',
-                            500: '#334e68',
-                            800: '#102a43',
-                            900: '#0b69a3',
-                            950: '#061b2e'
-                        }
                     }
                 }
             }
@@ -36,278 +27,436 @@
     </script>
     <style>
         .glass-card {
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(226, 232, 240, 0.8);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 182, 193, 0.4);
+            box-shadow: 0 20px 50px -15px rgba(236, 72, 153, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .official-bg {
-            background: radial-gradient(circle at top left, #e2e8f0, transparent 50%),
-                        radial-gradient(circle at bottom right, #cbd5e1, transparent 50%),
-                        #f8fafc;
+        .dark .glass-card {
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid rgba(236, 72, 153, 0.2);
+            box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
         }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #fdf2f8 0%, #f0fdf4 50%, #f0f9ff 100%);
+            position: relative;
+            overflow-x: hidden;
+            transition: background 0.3s ease;
+        }
+        .dark .gradient-bg {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #090d16 100%);
+        }
+
+        /* ฟังก์ชันโหมดถนอมสายตา (Sepia Warm Tone) */
+        body.sepia-mode {
+            filter: sepia(0.3) hue-rotate(-10deg);
+        }
+
+        .blob-1, .blob-2, .blob-3 {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(95px);
+            z-index: -3;
+            opacity: 0.6;
+            animation: moveBlob 14s infinite alternate ease-in-out;
+        }
+        .blob-1 { width: 450px; height: 450px; background: rgba(244, 114, 182, 0.3); top: -120px; left: -100px; }
+        .blob-2 { width: 520px; height: 520px; background: rgba(56, 189, 248, 0.28); top: 25%; right: -150px; animation-delay: -4s; }
+        .blob-3 { width: 400px; height: 400px; background: rgba(168, 85, 247, 0.2); bottom: -80px; left: 25%; animation-delay: -8s; }
+
+        .bg-watermark {
+            position: fixed;
+            z-index: -2;
+            opacity: 0.035;
+            pointer-events: none;
+            user-select: none;
+            filter: grayscale(15%);
+        }
+        .dark .bg-watermark { opacity: 0.07; filter: invert(1) grayscale(15%); }
+
+        @keyframes moveBlob {
+            0% { transform: translate(0px, 0px) scale(1) rotate(0deg); }
+            50% { transform: translate(60px, 50px) scale(1.15) rotate(10deg); }
+            100% { transform: translate(-50px, 40px) scale(0.9) rotate(-10deg); }
+        }
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(1.5deg); }
+        }
+        @keyframes floatWatermark {
+            0%, 100% { transform: translateY(0px) scale(1) rotate(-12deg); }
+            50% { transform: translateY(-20px) scale(1.04) rotate(-8deg); }
+        }
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.96) translateY(12px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes pulseNeon {
+            0%, 100% { box-shadow: 0 0 20px rgba(236, 72, 153, 0.4), 0 0 40px rgba(56, 189, 248, 0.2); }
+            50% { box-shadow: 0 0 35px rgba(236, 72, 153, 0.7), 0 0 60px rgba(56, 189, 248, 0.5); }
+        }
+
+        .animate-float { animation: floatSlow 4s ease-in-out infinite; }
+        .animate-watermark { animation: floatWatermark 9s ease-in-out infinite; }
+        .animate-fade-in { animation: fadeInScale 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-toast { animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .neon-btn { animation: pulseNeon 3.5s infinite; }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #fdf2f8; }
+        .dark ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #f472b6; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #db2777; }
+
+        button, input, select, textarea { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
 </head>
-<body class="official-bg min-h-screen font-sans text-slate-800 antialiased pb-12">
+<body class="gradient-bg min-h-screen font-sans text-slate-800 dark:text-slate-100 antialiased pb-24 selection:bg-pink-500 selection:text-white">
 
-    <!-- Header / Navbar -->
-    <header class="sticky top-0 z-40 bg-slate-900 text-white shadow-md border-b border-slate-700">
-        <div class="max-w-6xl mx-auto px-4 h-20 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-blue-700 flex items-center justify-center text-white shadow-md border border-blue-500">
-                    <i class="fa-solid fa-building-shield text-xl"></i>
+    <div class="blob-1"></div>
+    <div class="blob-2"></div>
+    <div class="blob-3"></div>
+
+    <img src="https://lru.ac.th/th/wp-content/uploads/2024/03/LRuQ.png" alt="Watermark" class="bg-watermark animate-watermark w-[320px] sm:w-[420px] h-[320px] sm:h-[420px] top-12 left-[-90px]" onerror="this.src='https://placehold.co/420x420/f472b6/ffffff?text=LRU';">
+    <img src="https://lru.ac.th/th/wp-content/uploads/2024/03/LRuQ.png" alt="Watermark" class="bg-watermark animate-watermark w-[380px] sm:w-[480px] h-[380px] sm:h-[480px] bottom-10 right-[-110px]" style="animation-delay: -4.5s;" onerror="this.src='https://placehold.co/480x480/38bdf8/ffffff?text=LRU';">
+
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none max-w-[calc(100vw-3rem)]"></div>
+
+    <!-- Responsive Header / Navigation Bar -->
+    <header class="sticky top-0 z-40 glass-card border-b border-pink-100/80 dark:border-slate-800 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between gap-2">
+            <!-- Logo & Title -->
+            <div class="flex items-center gap-2.5 sm:gap-3.5 group cursor-pointer min-w-0" onclick="switchTab('submit')">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-white dark:bg-slate-800 p-2 flex items-center justify-center shadow-lg shadow-pink-500/15 border border-pink-200 dark:border-slate-700 transform group-hover:scale-105 group-hover:rotate-3 transition-all duration-300 overflow-hidden shrink-0">
+                    <img src="https://lru.ac.th/th/wp-content/uploads/2024/03/LRuQ.png" alt="โลโก้มหาวิทยาลัยราชภัฏเลย" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='https://placehold.co/150/f472b6/ffffff?text=LRU';">
                 </div>
-                <div>
-                    <h1 class="font-bold text-base sm:text-lg leading-tight tracking-wide text-slate-100">ระบบรับเรื่องร้องเรียนและร้องทุกข์ออนไลน์</h1>
-                    <p class="text-xs text-slate-400 font-light">E-Complaint & Transparency Governance Portal</p>
+                <div class="min-w-0">
+                    <h1 class="font-extrabold text-xs sm:text-base leading-tight bg-gradient-to-r from-pink-600 via-purple-600 to-sky-500 bg-clip-text text-transparent truncate">LRU HELP CENTER</h1>
+                    <p class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5 truncate">
+                        <span class="w-2 h-2 rounded-full bg-pink-500 animate-ping shrink-0"></span> <span data-i18n="university_name">มหาวิทยาลัยราชภัฏเลย</span>
+                    </p>
                 </div>
             </div>
 
-            <div class="flex items-center gap-3">
-                <!-- Navigation Tabs -->
-                <nav class="flex bg-slate-800 p-1 rounded-xl text-xs sm:text-sm font-medium border border-slate-700">
-                    <button onclick="switchTab('submit')" id="tab-submit" class="px-3.5 py-1.5 rounded-lg transition-all shadow-sm bg-blue-600 text-white font-semibold">
-                        <i class="fa-solid fa-file-pen mr-1.5"></i>ยื่นเรื่องร้องเรียน
-                    </button>
-                    <button onclick="switchTab('track')" id="tab-track" class="px-3.5 py-1.5 rounded-lg transition-all text-slate-300 hover:text-white">
-                        <i class="fa-solid fa-magnifying-glass-location mr-1.5"></i>ติดตามสถานะ
-                    </button>
-                    <button onclick="switchTab('admin')" id="tab-admin" class="px-3.5 py-1.5 rounded-lg transition-all text-slate-300 hover:text-white flex items-center gap-1.5">
-                        <i class="fa-solid fa-user-shield"></i>
-                        <span>เจ้าหน้าที่</span>
-                        <i id="adminLockIcon" class="fa-solid fa-lock text-[10px] text-slate-400"></i>
-                    </button>
+            <!-- Navigation Menu -->
+            <div class="flex items-center gap-1">
+                <nav id="mainNav" class="flex bg-pink-100/60 dark:bg-slate-800/80 p-1 rounded-xl sm:rounded-2xl text-[11px] sm:text-xs font-semibold backdrop-blur-md shadow-inner border border-white/80 dark:border-slate-700 overflow-x-auto max-w-[55vw] sm:max-w-none scrollbar-none">
+                    <!-- Nav items dynamically rendered -->
                 </nav>
-
-                <!-- Admin Logout Button -->
-                <button id="adminLogoutBtn" onclick="adminLogout()" class="hidden px-3 py-1.5 rounded-lg bg-rose-900/80 hover:bg-rose-800 text-rose-200 text-xs font-medium transition-all border border-rose-700">
-                    <i class="fa-solid fa-right-from-bracket mr-1"></i>ออกระบบ
-                </button>
             </div>
         </div>
     </header>
 
-    <main class="max-w-4xl mx-auto px-4 pt-8">
+    <main class="max-w-4xl mx-auto px-4 pt-6 sm:pt-10">
 
-        <!-- TAB 1: FORM (ยื่นเรื่องร้องเรียน) -->
-        <section id="sec-submit" class="space-y-6">
-            <div class="text-center max-w-2xl mx-auto mb-8">
-                <span class="text-xs font-semibold tracking-wider text-blue-800 uppercase bg-blue-100 px-3 py-1 rounded-full border border-blue-200">Official Helpdesk Portal</span>
-                <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 mt-3">แบบฟอร์มยื่นเรื่องร้องเรียน / ร้องทุกข์</h2>
-                <p class="text-slate-600 text-xs sm:text-sm mt-1">กรุณากรอกข้อมูลให้ครบถ้วนตามความเป็นจริง ข้อมูลของท่านจะถูกเก็บรักษาเป็นความลับตามกฎหมาย</p>
+        <!-- TAB 1: FORM -->
+        <section id="sec-submit" class="space-y-6 animate-fade-in max-w-2xl mx-auto">
+            <div class="text-center max-w-lg mx-auto mb-6 sm:mb-8 space-y-2">
+                <span class="inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-pink-600 dark:text-pink-400 bg-pink-50/90 dark:bg-slate-800 px-3.5 py-1.5 rounded-full border border-pink-200/80 dark:border-slate-700 shadow-sm animate-float">
+                    <i class="fa-solid fa-bolt text-pink-500 animate-pulse"></i>Loei Rajabhat Support
+                </span>
+                <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight" data-i18n="form_heading">ส่งเรื่องร้องเรียน / ข้อเสนอแนะ</h2>
+                <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm" data-i18n="form_subheading">ระบบกลางรับเรื่องร้องเรียนภายในมหาวิทยาลัย รวดเร็ว ปลอดภัย ตรวจสอบสถานะในประวัติของฉันได้ทันที</p>
             </div>
 
-            <form id="complaintForm" onsubmit="handleFormSubmit(event)" class="glass-card rounded-2xl p-6 sm:p-10 shadow-lg border border-slate-200 space-y-6">
+            <form id="complaintForm" onsubmit="handleFormSubmit(event)" class="glass-card rounded-[2rem] sm:rounded-[2.5rem] p-5 sm:p-10 space-y-5 sm:space-y-6">
                 
-                <!-- Category & Urgency -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 uppercase mb-2">หมวดหมู่เรื่องร้องเรียน <span class="text-rose-600">*</span></label>
-                        <select id="category" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none transition-all text-sm">
-                            <option value="">-- โปรดระบุหมวดหมู่ --</option>
-                            <option value="การให้บริการของเจ้าหน้าที่">🤝 การให้บริการของเจ้าหน้าที่ / การละเว้นการปฏิบัติหน้าที่</option>
-                            <option value="อาคารสถานที่และความปลอดภัย">🏢 อาคารสถานที่ / สิ่งแวดล้อม / ความปลอดภัย</option>
-                            <option value="ระบบเทคโนโลยีและไอที">💻 ระบบเทคโนโลยีสารสนเทศ / เครือข่าย</option>
-                            <option value="การทุจริตและผิดวินัย">⚖️ การทุจริตประผิดมิชอบ / ความผิดทางวินัย</option>
-                            <option value="งานจัดซื้อจัดจ้างและพัสดุ">📦 งานจัดซื้อจัดจ้าง / สัญญาพัสดุ</option>
-                            <option value="ข้อเสนอแนะการพัฒนา">💡 ข้อเสนอแนะแนวทางการพัฒนาองค์กร</option>
-                            <option value="อื่นๆ">❓ เรื่องอื่นๆ</option>
+                <!-- เพิ่มสถานะของผู้แจ้งปัญหา -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2"><span data-i18n="label_reporter_status">สถานะผู้แจ้งปัญหา</span> <span class="text-rose-500">*</span></label>
+                    <div class="relative">
+                        <select id="reporterStatus" class="w-full px-4.5 py-3.5 rounded-2xl border border-pink-200/90 dark:border-slate-700 bg-white/95 dark:bg-slate-800 dark:text-white focus:bg-white focus:ring-4 focus:ring-pink-500/20 focus:border-pink-500 focus:outline-none text-xs sm:text-sm appearance-none cursor-pointer shadow-sm">
+                            <option value="" data-i18n="opt_select_reporter_status">-- เลือกสถานะผู้แจ้งปัญหา --</option>
+                            <option value="นักศึกษา" data-i18n="opt_student">👨‍🎓 นักศึกษา</option>
+                            <option value="อาจารย์ / บุคลากร" data-i18n="opt_staff">👩‍🏫 อาจารย์ / บุคลากร</option>
+                            <option value="บุคคลภายนอก" data-i18n="opt_external">🌐 บุคคลภายนอก / ผู้มาติดต่อ</option>
                         </select>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-pink-400 text-xs">
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2"><span data-i18n="label_category">หน่วยงาน / คณะที่เกี่ยวข้อง</span> <span class="text-rose-500">*</span></label>
+                        <div class="relative">
+                            <select id="category" class="w-full px-4.5 py-3.5 rounded-2xl border border-pink-200/90 dark:border-slate-700 bg-white/95 dark:bg-slate-800 dark:text-white focus:bg-white focus:ring-4 focus:ring-pink-500/20 focus:border-pink-500 focus:outline-none text-xs sm:text-sm appearance-none cursor-pointer shadow-sm">
+                                <option value="" data-i18n="opt_select_cat">-- เลือกหน่วยงาน / คณะ --</option>
+                                <optgroup label="คณะวิชา" data-i18n-label="group_faculties">
+                                    <option value="คณะครุศาสตร์">🎓 คณะครุศาสตร์</option>
+                                    <option value="คณะมนุษยศาสตร์และสังคมศาสตร์">📚 คณะมนุษยศาสตร์และสังคมศาสตร์</option>
+                                    <option value="คณะวิทยาการจัดการ">💼 คณะวิทยาการจัดการ</option>
+                                    <option value="คณะวิทยาศาสตร์และเทคโนโลยี">🔬 คณะวิทยาศาสตร์และเทคโนโลยี</option>
+                                    <option value="คณะเทคโนโลยี">⚙️ คณะเทคโนโลยี</option>
+                                </optgroup>
+                                <optgroup label="สำนัก / กอง / หน่วยงานสนับสนุน" data-i18n-label="group_offices">
+                                    <option value="สำนักงานอธิการบดี">🏛️ สำนักงานอธิการบดี</option>
+                                    <option value="กองพัฒนานักศึกษา">🏃‍♂️ กองพัฒนานักศึกษา</option>
+                                    <option value="สำนักส่งเสริมวิชาการและงานทะเบียน">📝 สำนักส่งเสริมวิชาการและงานทะเบียน</option>
+                                    <option value="สำนักวิทยบริการและเทคโนโลยีสารสนเทศ">💻 สำนักวิทยบริการและเทคโนโลยีสารสนเทศ</option>
+                                    <option value="สำนักศิลปะและวัฒนธรรม">🏮 สำนักศิลปะและวัฒนธรรม</option>
+                                    <option value="อาคารสถานที่และสิ่งแวดล้อม">🏢 อาคารสถานที่ / สิ่งอำนวยความสะดวก</option>
+                                </optgroup>
+                                <option value="อื่นๆ" data-i18n="opt_other">❓ หน่วยงานอื่นๆ</option>
+                            </select>
+                            <span class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-pink-400 text-xs">
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </span>
+                        </div>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 uppercase mb-2">ระดับความเร่งด่วน <span class="text-rose-600">*</span></label>
-                        <select id="priority" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none transition-all text-sm">
-                            <option value="ปกติ">🟢 ปกติ (ดำเนินการภายใน 7 วันทำการ)</option>
-                            <option value="ด่วน">🟡 ด่วน (ดำเนินการภายใน 3 วันทำการ)</option>
-                            <option value="ด่วนที่สุด">🔴 ด่วนที่สุด (ดำเนินการตรวจสอบทันที)</option>
-                        </select>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2"><span data-i18n="label_priority">ระดับความเร่งด่วน</span> <span class="text-rose-500">*</span></label>
+                        <div class="relative">
+                            <select id="priority" class="w-full px-4.5 py-3.5 rounded-2xl border border-pink-200/90 dark:border-slate-700 bg-white/95 dark:bg-slate-800 dark:text-white focus:bg-white focus:ring-4 focus:ring-pink-500/20 focus:border-pink-500 focus:outline-none text-xs sm:text-sm appearance-none cursor-pointer shadow-sm">
+                                <option value="ปกติ" data-i18n="opt_normal">🟢 ปกติ (1-3 วันทำการ)</option>
+                                <option value="ด่วน" data-i18n="opt_urgent">🟡 ด่วน (ภายใน 24 ชม.)</option>
+                                <option value="ด่วนที่สุด" data-i18n="opt_very_urgent">🔴 ด่วนที่สุด (แก้ไขทันที)</option>
+                            </select>
+                            <span class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-pink-400 text-xs">
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Subject -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-2">หัวข้อเรื่องร้องเรียน <span class="text-rose-600">*</span></label>
-                    <input type="text" id="subject" required placeholder="สรุปสาระสำคัญของเรื่องที่ต้องการร้องเรียน" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none transition-all text-sm">
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2"><span data-i18n="label_subject">หัวข้อเรื่อง</span> <span class="text-rose-500">*</span></label>
+                    <input type="text" id="subject" data-i18n-placeholder="placeholder_subject" placeholder="ระบุหัวข้อเรื่องสั้นๆ ให้ชัดเจน เช่น ปลั๊กไฟในห้องเรียนเสีย" class="w-full px-4.5 py-3.5 rounded-2xl border border-pink-200/90 dark:border-slate-700 bg-white/95 dark:bg-slate-800 dark:text-white focus:bg-white focus:ring-4 focus:ring-pink-500/20 focus:border-pink-500 focus:outline-none text-xs sm:text-sm shadow-sm">
                 </div>
 
-                <!-- Incident Location & Time -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 uppercase mb-2">วันและเวลาที่เกิดเหตุ</label>
-                        <input type="datetime-local" id="incidentTime" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none transition-all text-sm text-slate-700">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 uppercase mb-2">สถานที่เกิดเหตุ / จุดสังเกต</label>
-                        <input type="text" id="location" placeholder="เช่น อาคาร A ชั้น 3, แผนกการเงิน" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none transition-all text-sm">
-                    </div>
-                </div>
-
-                <!-- Description -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-2">รายละเอียดเหตุการณ์ / ข้อร้องเรียน <span class="text-rose-600">*</span></label>
-                    <textarea id="description" required rows="4" placeholder="กรุณาระบุรายละเอียด ข้อเท็จจริง ผู้ที่เกี่ยวข้อง และลำดับเหตุการณ์ให้ชัดเจน..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none transition-all text-sm resize-none"></textarea>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider"><span data-i18n="label_description">รายละเอียดเรื่องร้องเรียน</span> <span class="text-rose-500">*</span></label>
+                        <span id="charCount" class="text-[11px] text-slate-400 font-medium">0 / 500 ตัวอักษร</span>
+                    </div>
+                    <textarea id="description" rows="4" maxlength="500" oninput="updateCharCount(this)" data-i18n-placeholder="placeholder_description" placeholder="อธิบายรายละเอียด เหตุการณ์ หรือปัญหาที่พบเจอให้ครบถ้วน..." class="w-full px-4.5 py-3.5 rounded-2xl border border-pink-200/90 dark:border-slate-700 bg-white/95 dark:bg-slate-800 dark:text-white focus:bg-white focus:ring-4 focus:ring-pink-500/20 focus:border-pink-500 focus:outline-none text-xs sm:text-sm resize-none shadow-sm"></textarea>
                 </div>
 
-                <!-- Attachment Field -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-2">แนบเอกสารหรือรูปภาพหลักฐาน (ถ้ามี)</label>
-                    <div class="border-2 border-dashed border-slate-300 rounded-xl p-4 text-center bg-slate-50 hover:bg-slate-100 transition-all cursor-pointer">
-                        <input type="file" id="evidence" class="hidden" onchange="updateFileName(this)">
-                        <label for="evidence" class="cursor-pointer flex flex-col items-center gap-1">
-                            <i class="fa-solid fa-cloud-arrow-up text-2xl text-slate-400"></i>
-                            <span id="fileNameDisplay" class="text-xs text-slate-600 font-medium">คลิกเพื่ออัปโหลดไฟล์หลักฐาน (PDF, PNG, JPG ขนาดไม่เกิน 5MB)</span>
-                        </label>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2" data-i18n="label_attachment">แนบรูปภาพประกอบหลักฐาน (ถ้ามี)</label>
+                    <div class="relative flex items-center justify-between px-4 sm:px-5 py-4 rounded-2xl border-2 border-dashed border-pink-300 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 hover:bg-white hover:border-pink-500 transition-all cursor-pointer group shadow-sm gap-3">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-pink-50 dark:bg-slate-700 text-pink-500 flex items-center justify-center text-base font-semibold group-hover:scale-110 transition-transform shadow-sm shrink-0">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p id="fileNameDisplay" class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 group-hover:text-pink-600 transition-colors truncate" data-i18n="text_file_upload">คลิกเพื่อเลือกไฟล์รูปภาพหลักฐาน</p>
+                                <p class="text-[10px] sm:text-[11px] text-slate-400" data-i18n="text_file_hint">รองรับ JPG, PNG ขนาดไม่เกิน 5MB</p>
+                            </div>
+                        </div>
+                        <input type="file" id="attachment" accept="image/*" onchange="handleFileSelect(this)" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
                     </div>
                 </div>
 
-                <!-- User Information Section -->
-                <div class="p-5 rounded-xl bg-slate-100/80 border border-slate-200 space-y-4">
-                    <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                <div class="p-4 sm:p-5 rounded-2xl bg-pink-50/50 dark:bg-slate-800/60 border border-pink-200/80 dark:border-slate-700 space-y-3.5 shadow-inner">
+                    <div class="flex items-center justify-between gap-2">
                         <div>
-                            <span class="text-sm font-semibold text-slate-800">ข้อมูลผู้ยื่นคำร้อง</span>
-                            <p class="text-xs text-slate-500">เลือกปกปิดตัวตนหากต้องการความเป็นส่วนตัวสูงสุด</p>
+                            <span class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200" data-i18n="label_anonymous">ส่งแบบไม่ระบุตัวตน (Anonymous)</span>
+                            <p class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400" data-i18n="sub_anonymous">ข้อมูลส่วนตัวของคุณจะถูกปิดเป็นความลับสูงสุด</p>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0">
                             <input type="checkbox" id="isAnonymous" onchange="toggleAnonymous(this.checked)" class="sr-only peer">
-                            <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-800"></div>
+                            <div class="w-11 h-6 bg-slate-300 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-pink-500 peer-checked:to-sky-500 shadow-sm"></div>
                         </label>
                     </div>
 
-                    <div id="contactFields" class="space-y-4">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">สถานะผู้แจ้ง</label>
-                                <select id="userType" class="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-xs">
-                                    <option value="ประชาชนทั่วไป">ประชาชนทั่วไป</option>
-                                    <option value="บุคลากรภายใน">บุคลากร / เจ้าหน้าที่</option>
-                                    <option value="นักศึกษา/ผู้ใช้บริการ">นักศึกษา / ผู้รับบริการ</option>
-                                    <option value="ผู้ประกอบการ/คู่สัญญา">ผู้ประกอบการ / คู่สัญญา</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">ชื่อ-นามสกุล</label>
-                                <input type="text" id="fullname" placeholder="ระบุชื่อ-นามสกุลจริง" class="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-xs">
-                            </div>
+                    <div id="contactFields" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 transition-all duration-300">
+                        <div>
+                            <input type="text" id="fullname" data-i18n-placeholder="placeholder_fullname" placeholder="ชื่อ-นามสกุล / รหัสนักศึกษา" class="w-full px-4.5 py-3 rounded-xl border border-pink-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm">
                         </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">เบอร์โทรศัพท์ติดต่อ</label>
-                                <input type="tel" id="phone" placeholder="เช่น 081-234-5678" class="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-xs">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">อีเมล (สำหรับรับแจ้งความคืบหน้า)</label>
-                                <input type="email" id="email" placeholder="example@domain.com" class="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-xs">
-                            </div>
+                        <div>
+                            <input type="text" id="contact" data-i18n-placeholder="placeholder_contact" placeholder="เบอร์โทรศัพท์ หรือ อีเมลติดต่อ" class="w-full px-4.5 py-3 rounded-xl border border-pink-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm">
                         </div>
                     </div>
                 </div>
 
-                <!-- PDPA Consent Box -->
-                <div class="flex items-start gap-3 p-3 bg-blue-50/60 rounded-xl border border-blue-100">
-                    <input type="checkbox" id="pdpaConsent" required class="mt-1 rounded text-blue-600 focus:ring-blue-500">
-                    <label for="pdpaConsent" class="text-xs text-slate-600 leading-relaxed">
-                        ข้าพเจ้าขอรับรองว่าข้อมูลข้างต้นเป็นความจริงทุกประการ และยินยอมให้หน่วยงานจัดเก็บ ประมวลผล ข้อมูลส่วนบุคคลเพื่อประโยชน์ในการตรวจสอบและดำเนินการแก้ไขเรื่องร้องเรียนตาม พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562
-                    </label>
-                </div>
-
-                <!-- Submit Button -->
-                <button type="submit" class="w-full py-3.5 bg-blue-800 hover:bg-blue-900 text-white font-semibold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-sm border border-blue-900">
-                    <i class="fa-solid fa-paper-plane"></i>
-                    <span>ส่งเรื่องร้องเรียนเข้าสู่ระบบ</span>
+                <button type="submit" class="w-full py-4 bg-gradient-to-r from-pink-500 via-purple-600 to-sky-500 hover:from-pink-600 hover:to-sky-600 text-white font-bold rounded-2xl shadow-xl shadow-pink-500/25 transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2.5 text-xs sm:text-base neon-btn">
+                    <i class="fa-solid fa-paper-plane animate-bounce"></i>
+                    <span data-i18n="btn_submit">ส่งเรื่องร้องเรียนไปยังมหาวิทยาลัย</span>
                 </button>
             </form>
         </section>
 
-        <!-- TAB 2: TRACKING (ติดตามสถานะ) -->
-        <section id="sec-track" class="hidden space-y-6">
-            <div class="text-center max-w-lg mx-auto mb-8">
-                <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">ติดตามสถานะเรื่องร้องเรียน</h2>
-                <p class="text-slate-600 text-xs sm:text-sm mt-1">กรอกรหัสอ้างอิงเรื่องร้องเรียน (Ticket ID) เพื่อตรวจสอบความคืบหน้า</p>
+        <!-- TAB 2: MY HISTORY -->
+        <section id="sec-my-history" class="hidden space-y-6 animate-fade-in max-w-2xl mx-auto">
+            <div class="text-center max-w-lg mx-auto mb-6 space-y-2">
+                <span class="inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-pink-600 dark:text-pink-400 bg-pink-50/90 dark:bg-slate-800 px-3.5 py-1.5 rounded-full border border-pink-200/80 dark:border-slate-700 shadow-sm">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Device Local Storage History
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight" data-i18n="history_heading">ประวัติเรื่องร้องเรียนของฉัน</h2>
+                <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm" data-i18n="history_subheading">คลิกที่การ์ดเพื่อดูรายละเอียดและรูปภาพหลักฐานเฉพาะของแต่ละรายการ</p>
             </div>
 
-            <div class="glass-card rounded-2xl p-6 sm:p-8 shadow-md border border-slate-200 max-w-xl mx-auto space-y-6">
-                <div class="flex gap-2">
-                    <input type="text" id="trackInput" placeholder="กรอกรหัส เช่น TK-2026-882" class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 uppercase tracking-wider font-semibold">
-                    <button onclick="trackComplaint()" class="px-6 py-2.5 bg-blue-800 text-white rounded-xl font-medium hover:bg-blue-900 transition-all text-sm shadow-sm">
-                        ค้นหาเรื่อง
-                    </button>
-                </div>
+            <div id="myHistoryContainer" class="space-y-4 max-w-xl mx-auto">
+                <!-- Dynamically populated -->
+            </div>
+        </section>
 
-                <!-- Tracking Result Container -->
-                <div id="trackResult" class="hidden border-t border-slate-200 pt-6 space-y-4">
-                    <!-- Dynamic Result Inserted Here -->
+        <!-- TAB 3: ADMIN LOGIN -->
+        <section id="sec-admin-login" class="hidden space-y-6 animate-fade-in max-w-md mx-auto pt-4">
+            <div class="text-center space-y-2 mb-6">
+                <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-pink-50 dark:bg-slate-800 text-pink-600 dark:text-pink-400 flex items-center justify-center text-xl sm:text-2xl mx-auto shadow-md border border-pink-200 dark:border-slate-700">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight" data-i18n="admin_login_heading">เข้าสู่ระบบผู้ดูแลระบบ</h2>
+                <p class="text-slate-500 dark:text-slate-400 text-xs" data-i18n="admin_login_sub">กรอกชื่อผู้ใช้และรหัสผ่านเพื่อเข้าจัดการแดชบอร์ดแอดมิน</p>
+            </div>
+
+            <div class="glass-card rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 space-y-5 shadow-xl">
+                <div id="loginFormContainer">
+                    <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5" data-i18n="label_username">ชื่อผู้ใช้ (Username)</label>
+                            <input type="text" id="adminUser" required data-i18n-placeholder="placeholder_username" placeholder="ระบุชื่อผู้ใช้" class="w-full px-4.5 py-3.5 rounded-2xl border border-pink-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm" value="admin">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5" data-i18n="label_password">รหัสผ่าน (Password)</label>
+                            <input type="password" id="adminPass" required data-i18n-placeholder="placeholder_password" placeholder="ระบุรหัสผ่าน" class="w-full px-4.5 py-3.5 rounded-2xl border border-pink-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm" value="admin123">
+                        </div>
+                        
+                        <p id="adminAuthError" class="text-xs text-rose-500 hidden font-medium text-center bg-rose-50 dark:bg-slate-800 py-2.5 rounded-xl border border-rose-200 leading-relaxed"></p>
+                        
+                        <button type="submit" class="w-full py-3.5 sm:py-4 bg-gradient-to-r from-pink-500 to-sky-500 hover:opacity-95 text-white font-bold rounded-2xl text-xs sm:text-sm transition-all shadow-lg shadow-pink-500/25 transform active:scale-95" data-i18n="btn_login">
+                            <i class="fa-solid fa-right-to-bracket mr-2"></i> เข้าสู่ระบบแอดมิน
+                        </button>
+                    </form>
                 </div>
             </div>
         </section>
 
-        <!-- TAB 3: ADMIN DASHBOARD (ส่วนสำหรับเจ้าหน้าที่) -->
-        <section id="sec-admin" class="hidden space-y-6">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2 border-b border-slate-200 pb-4">
+        <!-- TAB 4: ADMIN DASHBOARD -->
+        <section id="sec-admin" class="hidden space-y-6 animate-fade-in">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
                 <div>
-                    <h2 class="text-xl font-bold text-slate-900">ศูนย์จัดการเรื่องร้องเรียน (Officer Dashboard)</h2>
-                    <p class="text-slate-500 text-xs">ส่วนงานบริหารจัดการ ตรวจสอบ และสรุปผลการดำเนินการร้องเรียน</p>
+                    <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="fa-solid fa-gauge-high text-pink-500"></i> <span data-i18n="dash_heading">แดชบอร์ดและกราฟภาพรวม (แอดมิน)</span>
+                    </h2>
+                    <p class="text-slate-500 dark:text-slate-400 text-xs" data-i18n="dash_sub">สรุปสถิติมุมมองภาพรวม และจัดการรายการเรื่องร้องเรียนของระบบ</p>
                 </div>
-                <button onclick="clearAllData()" class="text-xs text-rose-600 hover:text-rose-800 underline font-medium flex items-center gap-1">
-                    <i class="fa-solid fa-trash-can"></i>ล้างข้อมูลทดสอบทั้งหมด
-                </button>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <button onclick="generateMockData()" class="px-3 py-2 bg-pink-50 dark:bg-slate-800 text-pink-600 dark:text-pink-400 hover:bg-pink-100 rounded-xl text-xs font-semibold transition-all border border-pink-200 dark:border-slate-700 flex items-center gap-1.5 shadow-sm transform active:scale-95">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> <span data-i18n="btn_mock">สร้างข้อมูลตัวอย่าง</span>
+                    </button>
+                    <button onclick="clearAllData()" class="px-3 py-2 bg-rose-50 dark:bg-slate-800 text-rose-600 dark:text-rose-400 hover:bg-rose-100 rounded-xl text-xs font-semibold transition-all border border-rose-200 dark:border-slate-700 flex items-center gap-1.5 shadow-sm transform active:scale-95">
+                        <i class="fa-solid fa-trash-can"></i> <span data-i18n="btn_clear">ล้างข้อมูล</span>
+                    </button>
+                    <button onclick="adminLogout()" class="px-3 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-rose-50 hover:text-rose-600 rounded-xl text-xs font-semibold transition-all border border-slate-200 dark:border-slate-700 flex items-center gap-1.5 shadow-sm transform active:scale-95">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i> <span data-i18n="btn_logout">ออกจากระบบ</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Stats Widgets -->
-            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                <div class="glass-card p-4 rounded-xl flex items-center gap-3 border-l-4 border-l-slate-700">
-                    <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center text-lg font-bold">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="glass-card p-4 sm:p-5 rounded-2xl flex items-center gap-4 shadow-sm">
+                    <div class="w-12 h-12 rounded-xl bg-pink-50 dark:bg-slate-800 text-pink-600 dark:text-pink-400 flex items-center justify-center text-xl font-bold shadow-sm shrink-0">
                         <i class="fa-solid fa-inbox"></i>
                     </div>
                     <div>
-                        <p class="text-[11px] text-slate-500 font-medium">เรื่องทั้งหมด</p>
-                        <p id="stat-total" class="text-xl font-bold text-slate-800">0</p>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium" data-i18n="stat_total">เรื่องทั้งหมด</p>
+                        <p id="stat-total" class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white">0</p>
                     </div>
                 </div>
-                <div class="glass-card p-4 rounded-xl flex items-center gap-3 border-l-4 border-l-amber-500">
-                    <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-lg font-bold">
-                        <i class="fa-solid fa-clock"></i>
+                <div class="glass-card p-4 sm:p-5 rounded-2xl flex items-center gap-4 shadow-sm">
+                    <div class="w-12 h-12 rounded-xl bg-amber-50 dark:bg-slate-800 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xl font-bold shadow-sm shrink-0">
+                        <i class="fa-solid fa-spinner animate-spin"></i>
                     </div>
                     <div>
-                        <p class="text-[11px] text-slate-500 font-medium">รอการตรวจสอบ</p>
-                        <p id="stat-pending" class="text-xl font-bold text-slate-800">0</p>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium" data-i18n="stat_pending">กำลังดำเนินการ</p>
+                        <p id="stat-pending" class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white">0</p>
                     </div>
                 </div>
-                <div class="glass-card p-4 rounded-xl flex items-center gap-3 border-l-4 border-l-blue-600">
-                    <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-lg font-bold">
-                        <i class="fa-solid fa-spinner"></i>
-                    </div>
-                    <div>
-                        <p class="text-[11px] text-slate-500 font-medium">อยู่ระหว่างดำเนินการ</p>
-                        <p id="stat-processing" class="text-xl font-bold text-slate-800">0</p>
-                    </div>
-                </div>
-                <div class="glass-card p-4 rounded-xl flex items-center gap-3 border-l-4 border-l-emerald-600">
-                    <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg font-bold">
+                <div class="glass-card p-4 sm:p-5 rounded-2xl flex items-center gap-4 shadow-sm">
+                    <div class="w-12 h-12 rounded-xl bg-sky-50 dark:bg-slate-800 text-sky-600 dark:text-sky-400 flex items-center justify-center text-xl font-bold shadow-sm shrink-0">
                         <i class="fa-solid fa-circle-check"></i>
                     </div>
                     <div>
-                        <p class="text-[11px] text-slate-500 font-medium">เสร็จสิ้น/ยุติเรื่อง</p>
-                        <p id="stat-resolved" class="text-xl font-bold text-slate-800">0</p>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium" data-i18n="stat_resolved">แก้ไขเสร็จสิ้น</p>
+                        <p id="stat-resolved" class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white">0</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Complaint List Table -->
-            <div class="glass-card rounded-xl overflow-hidden shadow-sm border border-slate-200">
+            <!-- Graph Section -->
+            <div class="glass-card p-5 sm:p-6 rounded-3xl space-y-4 shadow-lg">
+                <h3 class="font-extrabold text-slate-900 dark:text-white text-xs sm:text-base flex items-center gap-2">
+                    <i class="fa-solid fa-chart-pie text-pink-500"></i> <span data-i18n="graph_heading">กราฟภาพรวมสัดส่วนสถานะเรื่องร้องเรียน</span>
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 pt-1" id="overviewGraphsContainer">
+                    <div class="p-3.5 bg-pink-50/50 dark:bg-slate-800/60 rounded-2xl border border-pink-100 dark:border-slate-700 space-y-2">
+                        <div class="flex justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
+                            <span data-i18n="status_received">รับเรื่องแล้ว</span>
+                            <span id="graph-percent-received">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden">
+                            <div id="graph-bar-received" class="bg-amber-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="p-3.5 bg-sky-50/50 dark:bg-slate-800/60 rounded-2xl border border-sky-100 dark:border-slate-700 space-y-2">
+                        <div class="flex justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
+                            <span data-i18n="status_in_progress">กำลังดำเนินการ</span>
+                            <span id="graph-percent-pending">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden">
+                            <div id="graph-bar-pending" class="bg-sky-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="p-3.5 bg-emerald-50/50 dark:bg-slate-800/60 rounded-2xl border border-emerald-100 dark:border-slate-700 space-y-2">
+                        <div class="flex justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
+                            <span data-i18n="status_completed">แก้ไขเรียบร้อย</span>
+                            <span id="graph-percent-resolved">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden">
+                            <div id="graph-bar-resolved" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search and Filter Bar -->
+            <div class="glass-card p-4 rounded-2xl flex flex-col sm:flex-row gap-3 items-center justify-between shadow-sm">
+                <div class="relative w-full sm:w-80">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-pink-400 text-xs">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <input type="text" id="adminSearchInput" oninput="renderAdminDashboard()" data-i18n-placeholder="placeholder_search" placeholder="ค้นหารหัส, หัวข้อ หรือผู้แจ้ง..." class="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-800 dark:text-white rounded-xl border border-pink-200 dark:border-slate-700 text-xs focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm">
+                </div>
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap" data-i18n="filter_status">กรองสถานะ:</span>
+                    <select id="adminStatusFilter" onchange="renderAdminDashboard()" class="w-full sm:w-auto px-3.5 py-2.5 bg-white dark:bg-slate-800 dark:text-white rounded-xl border border-pink-200 dark:border-slate-700 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm cursor-pointer">
+                        <option value="ALL" data-i18n="opt_all">ทั้งหมด</option>
+                        <option value="รับเรื่องแล้ว" data-i18n="status_received">🟠 รับเรื่องแล้ว</option>
+                        <option value="กำลังดำเนินการ" data-i18n="status_in_progress">🔵 กำลังดำเนินการ</option>
+                        <option value="แก้ไขเรียบร้อย" data-i18n="status_completed">🟢 แก้ไขเรียบร้อย</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="glass-card rounded-2xl overflow-hidden shadow-xl">
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs">
-                        <thead class="bg-slate-100 text-slate-700 uppercase font-semibold border-b border-slate-200">
+                    <table class="w-full text-left text-xs sm:text-sm">
+                        <thead class="bg-pink-50/80 dark:bg-slate-800 text-slate-600 dark:text-slate-300 uppercase font-extrabold border-b border-pink-100 dark:border-slate-700 text-[11px]">
                             <tr>
-                                <th class="p-3.5">รหัส Ticket</th>
-                                <th class="p-3.5">หัวข้อ / หมวดหมู่</th>
-                                <th class="p-3.5">ผู้ยื่นเรื่อง</th>
-                                <th class="p-3.5">ความเร่งด่วน</th>
-                                <th class="p-3.5">สถานะการดำเนินการ</th>
-                                <th class="p-3.5 text-center">จัดการ</th>
+                                <th class="p-3.5 sm:p-4" data-i18n="th_ticket">รหัส Ticket</th>
+                                <th class="p-3.5 sm:p-4" data-i18n="th_subject_dept">หัวข้อเรื่อง / หน่วยงาน</th>
+                                <th class="p-3.5 sm:p-4" data-i18n="th_evidence">หลักฐาน</th>
+                                <th class="p-3.5 sm:p-4" data-i18n="th_sender">ผู้แจ้ง & ติดต่อ</th>
+                                <th class="p-3.5 sm:p-4" data-i18n="th_priority">ความเร่งด่วน</th>
+                                <th class="p-3.5 sm:p-4" data-i18n="th_status">สถานะ</th>
+                                <th class="p-3.5 sm:p-4 text-center" data-i18n="th_reply">ตอบกลับ</th>
+                                <th class="p-3.5 sm:p-4 text-center" data-i18n="th_manage">จัดการ</th>
                             </tr>
                         </thead>
-                        <tbody id="adminTableBody" class="divide-y divide-slate-200 bg-white">
+                        <tbody id="adminTableBody" class="divide-y divide-pink-50 dark:divide-slate-800 bg-white/40 dark:bg-slate-900/40">
                             <!-- Dynamic Rows -->
                         </tbody>
                     </table>
@@ -315,288 +464,1144 @@
             </div>
         </section>
 
+        <!-- TAB 5: SETTING -->
+        <section id="sec-setting" class="hidden space-y-6 animate-fade-in max-w-2xl mx-auto">
+            <div class="text-center max-w-lg mx-auto mb-8 space-y-2">
+                <span class="inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-pink-600 dark:text-pink-400 bg-pink-50/90 dark:bg-slate-800 px-3.5 py-1.5 rounded-full border border-pink-200/80 dark:border-slate-700 shadow-sm">
+                    <i class="fa-solid fa-sliders text-pink-500"></i> Preference & Configuration
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight" data-i18n="setting_heading">การตั้งค่าระบบ</h2>
+                <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm" data-i18n="setting_sub">ปรับแต่งโหมดการแสดงผล เสียงเอฟเฟกต์ ภาษา และจัดการข้อมูลส่วนตัวในเบราว์เซอร์ของคุณ</p>
+            </div>
+
+            <!-- กล่องตั้งค่าหลัก -->
+            <div class="grid grid-cols-1 gap-5">
+
+                <!-- ภาษาของระบบ -->
+                <div class="glass-card rounded-3xl p-5 sm:p-6 space-y-4 shadow-lg relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl group-hover:bg-purple-500/10 transition-all pointer-events-none"></div>
+                    <div class="flex items-center justify-between border-b border-pink-100/80 dark:border-slate-800 pb-3.5">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-2xl bg-purple-100 dark:bg-slate-800 text-purple-600 dark:text-purple-400 flex items-center justify-center text-base font-bold shadow-sm">
+                                <i class="fa-solid fa-language"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-extrabold text-slate-900 dark:text-white text-sm sm:text-base" data-i18n="lang_settings_title">ภาษาของระบบ (Language)</h3>
+                                <p class="text-[11px] text-slate-400" data-i18n="lang_select_sub">สลับระหว่างภาษาไทยและภาษาอังกฤษทันที</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] bg-purple-100/80 dark:bg-slate-700 text-purple-700 dark:text-purple-300 px-3 py-1 rounded-full font-bold uppercase tracking-wider">Language</span>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                        <span class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300" data-i18n="lang_select_label">เลือกภาษาที่ต้องการใช้งาน</span>
+                        <div class="grid grid-cols-2 sm:flex bg-pink-100/60 dark:bg-slate-800 p-1.5 rounded-2xl text-xs gap-1 border border-pink-200/60 dark:border-slate-700 shadow-inner">
+                            <button onclick="switchLanguage('th')" id="langBtnTh" class="px-4 py-2 rounded-xl font-bold transition-all flex items-center justify-center gap-2 shadow-sm bg-white text-pink-600">🇹🇭 ภาษาไทย</button>
+                            <button onclick="switchLanguage('en')" id="langBtnEn" class="px-4 py-2 rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-slate-500 hover:text-slate-800 dark:hover:text-white">🇬🇧 English</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- การแสดงผลและธีม -->
+                <div class="glass-card rounded-3xl p-5 sm:p-6 space-y-5 shadow-lg relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-pink-500/5 rounded-full blur-2xl group-hover:bg-pink-500/10 transition-all pointer-events-none"></div>
+                    <div class="flex items-center justify-between border-b border-pink-100/80 dark:border-slate-800 pb-3.5">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-2xl bg-pink-100 dark:bg-slate-800 text-pink-600 dark:text-pink-400 flex items-center justify-center text-base font-bold shadow-sm">
+                                <i class="fa-solid fa-palette"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-extrabold text-slate-900 dark:text-white text-sm sm:text-base" data-i18n="appearance_title">การแสดงผลและธีม</h3>
+                                <p class="text-[11px] text-slate-400">ปรับเปลี่ยนหน้าตา โหมดมืดสว่าง และการถนอมสายตา</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] bg-pink-100/80 dark:bg-slate-700 text-pink-700 dark:text-pink-300 px-3 py-1 rounded-full font-bold uppercase tracking-wider">UI Theme</span>
+                    </div>
+
+                    <!-- Dark / Light Mode -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-1">
+                        <div>
+                            <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 block" data-i18n="theme_mode_label">โหมดหน้าจอ (Theme)</span>
+                            <span class="text-[11px] text-slate-400" data-i18n="theme_mode_sub">สลับระหว่างโหมดสว่างและโหมดมืด</span>
+                        </div>
+                        <div class="grid grid-cols-2 sm:flex bg-pink-100/60 dark:bg-slate-800 p-1.5 rounded-2xl text-xs gap-1 border border-pink-200/60 dark:border-slate-700 shadow-inner">
+                            <button onclick="setThemeMode('light')" id="themeBtnLight" class="px-3.5 py-2 rounded-xl font-bold transition-all flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-sun text-amber-500"></i> <span data-i18n="theme_light">สว่าง</span>
+                            </button>
+                            <button onclick="setThemeMode('dark')" id="themeBtnDark" class="px-3.5 py-2 rounded-xl font-bold transition-all flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-moon text-indigo-400"></i> <span data-i18n="theme_dark">มืด</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Eye Care / Sepia Mode -->
+                    <div class="flex items-center justify-between py-3 border-t border-pink-100/60 dark:border-slate-800/60">
+                        <div>
+                            <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 block" data-i18n="sepia_label">โหมดถนอมสายตา (Sepia Tone)</span>
+                            <span class="text-[11px] text-slate-400" data-i18n="sepia_sub">ปรับโทนสีหน้าให้อุ่นขึ้น ลดอาการล้าทางสายตา</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                            <input type="checkbox" id="sepiaToggle" onchange="toggleSepiaMode(this.checked)" class="sr-only peer">
+                            <div class="w-12 h-7 bg-slate-300 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-amber-500 shadow-sm"></div>
+                        </label>
+                    </div>
+
+                    <!-- Font Size Scaling -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-2 border-t border-pink-100/60 dark:border-slate-800/60">
+                        <div>
+                            <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 block" data-i18n="fontsize_label">ขนาดตัวอักษรเว็บไซต์</span>
+                            <span class="text-[11px] text-slate-400" data-i18n="fontsize_sub">ปรับขนาดฟอนต์ให้เหมาะสมกับการอ่านของคุณ</span>
+                        </div>
+                        <select id="fontSizeSelect" onchange="setFontSize(this.value)" class="px-4 py-2.5 bg-white dark:bg-slate-800 dark:text-white rounded-xl border border-pink-200 dark:border-slate-700 text-xs sm:text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm cursor-pointer">
+                            <option value="normal" data-i18n="font_normal">ปกติ (Default)</option>
+                            <option value="large" data-i18n="font_large">ใหญ่ (Large)</option>
+                            <option value="xlarge" data-i18n="font_xlarge">ใหญ่มาก (Extra Large)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- เสียงและเอฟเฟกต์ -->
+                <div class="glass-card rounded-3xl p-5 sm:p-6 space-y-4 shadow-lg relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-sky-500/5 rounded-full blur-2xl group-hover:bg-sky-500/10 transition-all pointer-events-none"></div>
+                    <div class="flex items-center justify-between border-b border-pink-100/80 dark:border-slate-800 pb-3.5">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-2xl bg-sky-100 dark:bg-slate-800 text-sky-600 dark:text-sky-400 flex items-center justify-center text-base font-bold shadow-sm">
+                                <i class="fa-solid fa-volume-high"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-extrabold text-slate-900 dark:text-white text-sm sm:text-base" data-i18n="audio_title">เสียงและเอฟเฟกต์</h3>
+                                <p class="text-[11px] text-slate-400" data-i18n="sound_sub">เล่นเสียงเมื่อคลิกปุ่มหรือส่งข้อมูลสำเร็จ</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] bg-sky-100/80 dark:bg-slate-700 text-sky-700 dark:text-sky-300 px-3 py-1 rounded-full font-bold uppercase tracking-wider">Sound FX</span>
+                    </div>
+
+                    <div class="flex items-center justify-between py-1">
+                        <div>
+                            <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 block" data-i18n="sound_label">เสียงกดปุ่มและแจ้งเตือน (Sound FX)</span>
+                            <span class="text-[11px] text-slate-400">เปิด/ปิดเสียงตอบสนองเวลากดปุ่มในระบบ</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                            <input type="checkbox" id="soundFxToggle" checked onchange="toggleSoundFx(this.checked)" class="sr-only peer">
+                            <div class="w-12 h-7 bg-slate-300 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-sky-500 shadow-sm"></div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- ข้อมูลและแคชในเครื่อง -->
+                <div class="glass-card rounded-3xl p-5 sm:p-6 space-y-4 shadow-lg relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-rose-500/5 rounded-full blur-2xl group-hover:bg-rose-500/10 transition-all pointer-events-none"></div>
+                    <div class="flex items-center justify-between border-b border-pink-100/80 dark:border-slate-800 pb-3.5">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-2xl bg-rose-100 dark:bg-slate-800 text-rose-600 dark:text-rose-400 flex items-center justify-center text-base font-bold shadow-sm">
+                                <i class="fa-solid fa-database"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-extrabold text-slate-900 dark:text-white text-sm sm:text-base" data-i18n="storage_title">ข้อมูลและแคชในเครื่อง</h3>
+                                <p class="text-[11px] text-slate-400" data-i18n="clear_history_sub">ล้างรหัสติดตามเรื่องร้องเรียนที่บันทึกไว้ในเบราว์เซอร์</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] bg-rose-100/80 dark:bg-slate-700 text-rose-700 dark:text-rose-300 px-3 py-1 rounded-full font-bold uppercase tracking-wider">Storage</span>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 py-1">
+                        <div>
+                            <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 block" data-i18n="clear_history_label">ล้างประวัติการแจ้งเรื่องในเครื่องนี้</span>
+                            <span class="text-[11px] text-slate-400">ข้อมูล Ticket IDs ที่จัดเก็บอยู่ใน LocalStorage จะถูกเคลียร์</span>
+                        </div>
+                        <button onclick="clearMyLocalTickets()" class="w-full sm:w-auto px-5 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-slate-800 dark:text-rose-400 rounded-2xl text-xs font-bold transition-all border border-rose-200 dark:border-slate-700 shadow-sm flex items-center justify-center gap-2 transform active:scale-95">
+                            <i class="fa-solid fa-trash-can"></i> <span data-i18n="btn_clear_history">ล้างประวัติของฉัน</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- System Version Footer Info -->
+            <div class="p-4 bg-pink-50/70 dark:bg-slate-900/60 rounded-2xl border border-pink-100 dark:border-slate-800 text-center space-y-1 shadow-inner">
+                <p class="text-xs font-bold text-pink-600 dark:text-pink-400"><i class="fa-solid fa-shield-halved mr-1"></i> LRU Help Desk System v3.5 Professional</p>
+                <p class="text-[11px] text-slate-400" data-i18n="university_name">มหาวิทยาลัยราชภัฏเลย (Loei Rajabhat University)</p>
+            </div>
+        </section>
+
     </main>
 
-    <!-- Modal Admin Login -->
-    <div id="adminLoginModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-6 space-y-5 shadow-2xl relative border border-slate-200">
-            <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <div class="text-center space-y-1">
-                <div class="w-12 h-12 bg-blue-100 text-blue-800 rounded-xl flex items-center justify-center text-xl mx-auto mb-2 border border-blue-200">
-                    <i class="fa-solid fa-user-check"></i>
-                </div>
-                <h3 class="text-lg font-bold text-slate-900">เข้าสู่ระบบสำหรับเจ้าหน้าที่</h3>
-                <p class="text-xs text-slate-500">กรอกบัญชีผู้ใช้เพื่อเข้าจัดการระบบหลังบ้าน</p>
+    <!-- Modal Success -->
+    <div id="successModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md hidden items-center justify-center z-50 p-4 animate-fade-in">
+        <div class="bg-white dark:bg-slate-800 backdrop-blur-xl rounded-[2rem] sm:rounded-[2.5rem] max-w-sm w-full p-6 sm:p-7 text-center space-y-4 shadow-2xl border border-pink-100 dark:border-slate-700">
+            <div class="w-14 h-14 sm:w-16 sm:h-16 bg-pink-50 dark:bg-slate-700 text-pink-600 dark:text-pink-400 rounded-full flex items-center justify-center text-xl sm:text-2xl mx-auto shadow-sm animate-bounce">
+                <i class="fa-solid fa-check"></i>
             </div>
-            <form onsubmit="handleAdminLogin(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">ชื่อผู้ใช้งาน</label>
-                    <input type="text" id="adminUser" placeholder="admin" required class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">รหัสผ่าน</label>
-                    <input type="password" id="adminPass" placeholder="••••••••" required class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600">
-                </div>
-                <p id="adminAuthError" class="text-xs text-rose-600 hidden text-center font-medium">ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง (ลอง admin / admin123)</p>
-                <button type="submit" class="w-full py-2.5 bg-blue-800 hover:bg-blue-900 text-white font-medium rounded-lg text-xs transition-all">
-                    ยืนยันเข้าสู่ระบบ
+            <h3 class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white" data-i18n="modal_success_title">ส่งเรื่องร้องเรียนสำเร็จ!</h3>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400" data-i18n="modal_success_sub">บันทึกรหัสติดตามลงประวัติของคุณเรียบร้อยแล้ว</p>
+            <div class="p-3.5 bg-pink-50/50 dark:bg-slate-900 rounded-2xl font-mono text-sm sm:text-base font-extrabold text-pink-600 dark:text-pink-400 tracking-wider border border-pink-200 dark:border-slate-700 shadow-inner" id="modalTicketId">
+                #LRU-XXXX
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="closeModalToHistory()" class="py-3 bg-pink-500 text-white rounded-xl font-semibold text-xs hover:bg-pink-600 transition-all shadow-md transform active:scale-95" data-i18n="btn_view_history">
+                    ดูประวัติของฉัน
                 </button>
-            </form>
+                <button onclick="closeModal()" class="py-3 bg-slate-900 dark:bg-slate-700 text-white rounded-xl font-semibold text-xs hover:bg-slate-800 transition-all shadow-md transform active:scale-95" data-i18n="btn_ok">
+                    ตกลง
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- Modal Notification Success -->
-    <div id="successModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 text-center space-y-4 shadow-2xl border border-slate-200">
-            <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-2xl mx-auto border border-emerald-200">
-                <i class="fa-solid fa-circle-check"></i>
-            </div>
-            <h3 class="text-xl font-bold text-slate-900">บันทึกเรื่องร้องเรียนเรียบร้อยแล้ว</h3>
-            <p class="text-xs text-slate-500">ระบบได้รับเรื่องของท่านแล้ว กรุณาบันทึกรหัสอ้างอิงด้านล่างนี้ไว้เพื่อใช้ในการติดตามความคืบหน้า</p>
-            
-            <div class="p-3 bg-slate-100 rounded-xl border border-slate-200 font-mono text-base font-bold text-blue-900 tracking-wider" id="modalTicketId">
-                #TK-2026-XXXX
-            </div>
-
-            <p class="text-[11px] text-slate-400">เจ้าหน้าที่จะดำเนินการตรวจสอบข้อมูลตามลำดับความเร่งด่วน</p>
-
-            <button onclick="closeModal()" class="w-full py-2.5 bg-slate-800 text-white rounded-lg font-medium text-xs hover:bg-slate-900 transition-all">
-                ตกลง / ปิดหน้าต่าง
+    <!-- Modal View Image -->
+    <div id="imageModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center z-50 p-4 animate-fade-in" onclick="closeImageModal()">
+        <div class="bg-white dark:bg-slate-800 rounded-[2rem] sm:rounded-[2.5rem] max-w-xl w-full p-4 sm:p-5 relative overflow-hidden shadow-2xl" onclick="event.stopPropagation()">
+            <button onclick="closeImageModal()" class="absolute top-3 right-3 sm:top-4 sm:right-4 bg-pink-50 dark:bg-slate-700 w-8 h-8 rounded-full text-pink-600 dark:text-pink-400 hover:bg-pink-100 flex items-center justify-center transition-all z-10 text-xs">
+                <i class="fa-solid fa-xmark"></i>
             </button>
+            <h3 class="font-bold text-slate-800 dark:text-white mb-3 px-1 text-xs sm:text-sm flex items-center gap-2"><i class="fa-solid fa-image text-pink-500"></i> <span data-i18n="modal_img_title">รูปภาพหลักฐานประกอบ</span></h3>
+            <div class="max-h-[75vh] overflow-auto flex items-center justify-center bg-slate-50 dark:bg-slate-900 rounded-2xl p-2">
+                <img id="modalImagePreview" src="" class="max-w-full rounded-xl object-contain shadow-sm">
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Admin Reply -->
+    <div id="replyModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md hidden items-center justify-center z-50 p-4 animate-fade-in">
+        <div class="bg-white dark:bg-slate-800 backdrop-blur-xl rounded-[2rem] sm:rounded-[2.5rem] max-w-md w-full p-5 sm:p-6 space-y-4 shadow-2xl relative border border-pink-100 dark:border-slate-700">
+            <button onclick="closeReplyModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-all w-8 h-8 rounded-full bg-pink-50 dark:bg-slate-700 flex items-center justify-center text-xs">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="flex items-center gap-3 border-b border-pink-100 dark:border-slate-700 pb-3.5">
+                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-pink-50 dark:bg-slate-700 text-pink-600 dark:text-pink-400 flex items-center justify-center text-base sm:text-lg font-bold shadow-sm shrink-0">
+                    <i class="fa-solid fa-comments"></i>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white truncate" id="replyTicketTitle" data-i18n="modal_reply_title">ตอบกลับเรื่องร้องเรียน</h3>
+                    <p class="text-[10px] sm:text-[11px] text-slate-400 truncate" id="replyTicketSub">รหัส: #LRU-XXXX</p>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1" data-i18n="modal_user_issue">รายละเอียดปัญหาของผู้แจ้ง</label>
+                    <div id="replyTicketDesc" class="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl text-xs text-slate-600 dark:text-slate-300 border border-slate-100 dark:border-slate-700 max-h-28 overflow-y-auto leading-relaxed">
+                        -
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1" data-i18n="modal_type_reply">พิมพ์ข้อความตอบกลับถึงผู้ใช้</label>
+                    <textarea id="adminReplyText" rows="3" data-i18n-placeholder="placeholder_reply" placeholder="พิมพ์ข้อความชี้แจงความคืบหน้า หรือวิธีแก้ไขปัญหา..." class="w-full p-3 rounded-xl border border-pink-200 dark:border-slate-700 bg-white dark:bg-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-pink-500 resize-none shadow-sm"></textarea>
+                </div>
+            </div>
+
+            <input type="hidden" id="currentReplyId">
+
+            <div class="flex justify-end gap-2 pt-1">
+                <button onclick="closeReplyModal()" class="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 text-xs font-semibold transition-all" data-i18n="btn_cancel">
+                    ยกเลิก
+                </button>
+                <button onclick="submitAdminReply()" class="px-4.5 py-2 bg-gradient-to-r from-pink-500 to-sky-500 hover:opacity-95 text-white rounded-xl text-xs font-semibold transition-all shadow-md shadow-pink-500/20 transform active:scale-95" data-i18n="btn_send_reply">
+                    <i class="fa-solid fa-paper-plane mr-1"></i> ส่งข้อความตอบกลับ
+                </button>
+            </div>
         </div>
     </div>
 
     <!-- JavaScript Application Logic -->
     <script>
-        const STORAGE_KEY = 'official_complaints_data';
+        // --- พจนานุกรมแปลภาษา (i18n Dictionary) ---
+        const translations = {
+            th: {
+                app_title: "ระบบแจ้งเรื่องร้องเรียนระดับองค์กร | มหาวิทยาลัยราชภัฏเลย",
+                university_name: "มหาวิทยาลัยราชภัฏเลย",
+                nav_submit: "แจ้งเรื่อง",
+                nav_history: "ประวัติ",
+                nav_admin: "แอดมิน",
+                nav_dashboard: "แดชบอร์ด",
+                nav_setting: "ตั้งค่า",
+                form_heading: "ส่งเรื่องร้องเรียน / ข้อเสนอแนะ",
+                form_subheading: "ระบบกลางรับเรื่องร้องเรียนภายในมหาวิทยาลัย รวดเร็ว ปลอดภัย ตรวจสอบสถานะในประวัติของฉันได้ทันที",
+                label_reporter_status: "สถานะผู้แจ้งปัญหา",
+                opt_select_reporter_status: "-- เลือกสถานะผู้แจ้งปัญหา --",
+                opt_student: "👨‍🎓 นักศึกษา",
+                opt_staff: "👩‍🏫 อาจารย์ / บุคลากร",
+                opt_external: "🌐 บุคคลภายนอก / ผู้มาติดต่อ",
+                label_category: "หน่วยงาน / คณะที่เกี่ยวข้อง",
+                opt_select_cat: "-- เลือกหน่วยงาน / คณะ --",
+                group_faculties: "คณะวิชา",
+                group_offices: "สำนัก / กอง / หน่วยงานสนับสนุน",
+                opt_other: "❓ หน่วยงานอื่นๆ",
+                label_priority: "ระดับความเร่งด่วน",
+                opt_normal: "🟢 ปกติ (1-3 วันทำการ)",
+                opt_urgent: "🟡 ด่วน (ภายใน 24 ชม.)",
+                opt_very_urgent: "🔴 ด่วนที่สุด (แก้ไขทันที)",
+                label_subject: "หัวข้อเรื่อง",
+                placeholder_subject: "ระบุหัวข้อเรื่องสั้นๆ ให้ชัดเจน เช่น ปลั๊กไฟในห้องเรียนเสีย",
+                label_description: "รายละเอียดเรื่องร้องเรียน",
+                placeholder_description: "อธิบายรายละเอียด เหตุการณ์ หรือปัญหาที่พบเจอให้ครบถ้วน...",
+                label_attachment: "แนบรูปภาพประกอบหลักฐาน (ถ้ามี)",
+                text_file_upload: "คลิกเพื่อเลือกไฟล์รูปภาพหลักฐาน",
+                text_file_hint: "รองรับ JPG, PNG ขนาดไม่เกิน 5MB",
+                label_anonymous: "ส่งแบบไม่ระบุตัวตน (Anonymous)",
+                sub_anonymous: "ข้อมูลส่วนตัวของคุณจะถูกปิดเป็นความลับสูงสุด",
+                placeholder_fullname: "ชื่อ-นามสกุล / รหัสนักศึกษา",
+                placeholder_contact: "เบอร์โทรศัพท์ หรือ อีเมลติดต่อ",
+                btn_submit: "ส่งเรื่องร้องเรียนไปยังมหาวิทยาลัย",
+                history_heading: "ประวัติเรื่องร้องเรียนของฉัน",
+                history_subheading: "คลิกที่การ์ดเพื่อดูรายละเอียดและรูปภาพหลักฐานเฉพาะของแต่ละรายการ",
+                admin_login_heading: "เข้าสู่ระบบผู้ดูแลระบบ",
+                admin_login_sub: "กรอกชื่อผู้ใช้และรหัสผ่านเพื่อเข้าจัดการแดชบอร์ดแอดมิน",
+                label_username: "ชื่อผู้ใช้ (Username)",
+                placeholder_username: "ระบุชื่อผู้ใช้",
+                label_password: "รหัสผ่าน (Password)",
+                placeholder_password: "ระบุรหัสผ่าน",
+                btn_login: "เข้าสู่ระบบแอดมิน",
+                dash_heading: "แดชบอร์ดและกราฟภาพรวม (แอดมิน)",
+                dash_sub: "สรุปสถิติมุมมองภาพรวม และจัดการรายการเรื่องร้องเรียนของระบบ",
+                btn_mock: "สร้างข้อมูลตัวอย่าง",
+                btn_clear: "ล้างข้อมูล",
+                btn_logout: "ออกจากระบบ",
+                stat_total: "เรื่องทั้งหมด",
+                stat_pending: "กำลังดำเนินการ",
+                stat_resolved: "แก้ไขเสร็จสิ้น",
+                graph_heading: "กราฟภาพรวมสัดส่วนสถานะเรื่องร้องเรียน",
+                status_received: "รับเรื่องแล้ว",
+                status_in_progress: "กำลังดำเนินการ",
+                status_completed: "แก้ไขเรียบร้อย",
+                placeholder_search: "ค้นหารหัส, หัวข้อ หรือผู้แจ้ง...",
+                filter_status: "กรองสถานะ:",
+                opt_all: "ทั้งหมด",
+                th_ticket: "รหัส Ticket",
+                th_subject_dept: "หัวข้อเรื่อง / หน่วยงาน",
+                th_evidence: "หลักฐาน",
+                th_sender: "ผู้แจ้ง & สถานะ",
+                th_priority: "ความเร่งด่วน",
+                th_status: "สถานะ",
+                th_reply: "ตอบกลับ",
+                th_manage: "จัดการ",
+                setting_heading: "การตั้งค่าระบบและลูกเล่น",
+                setting_sub: "ปรับแต่งโหมดการแสดงผล เสียงเอฟเฟกต์ ภาษา และจัดการข้อมูลส่วนตัวในเบราว์เซอร์ของคุณ",
+                lang_settings_title: "ภาษาของระบบ (Language)",
+                lang_select_label: "เลือกภาษาที่ต้องการใช้งาน",
+                lang_select_sub: "สลับระหว่างภาษาไทยและภาษาอังกฤษทันที",
+                appearance_title: "การแสดงผลและธีม",
+                theme_mode_label: "โหมดหน้าจอ (Theme)",
+                theme_mode_sub: "สลับระหว่างโหมดสว่างและโหมดมืด",
+                theme_light: "สว่าง",
+                theme_dark: "มืด",
+                sepia_label: "โหมดถนอมสายตา (Sepia Tone)",
+                sepia_sub: "ปรับโทนสีหน้าให้อุ่นขึ้น ลดอาการล้าทางสายตา",
+                fontsize_label: "ขนาดตัวอักษรเว็บไซต์",
+                fontsize_sub: "ปรับขนาดฟอนต์ให้เหมาะสมกับการอ่านของคุณ",
+                font_normal: "ปกติ (Default)",
+                font_large: "ใหญ่ (Large)",
+                font_xlarge: "ใหญ่มาก (Extra Large)",
+                audio_title: "เสียงและเอฟเฟกต์",
+                sound_label: "เสียงกดปุ่มและแจ้งเตือน (Sound FX)",
+                sound_sub: "เล่นเสียงเมื่อคลิกปุ่มหรือส่งข้อมูลสำเร็จ",
+                storage_title: "ข้อมูลและแคชในเครื่อง",
+                clear_history_label: "ล้างประวัติการแจ้งเรื่องในเครื่องนี้",
+                clear_history_sub: "ล้างรหัสติดตามเรื่องร้องเรียนที่บันทึกไว้ในเบราว์เซอร์",
+                btn_clear_history: "ล้างประวัติของฉัน",
+                modal_success_title: "ส่งเรื่องร้องเรียนสำเร็จ!",
+                modal_success_sub: "บันทึกรหัสติดตามลงประวัติของคุณเรียบร้อยแล้ว",
+                btn_view_history: "ดูประวัติของฉัน",
+                btn_ok: "ตกลง",
+                modal_img_title: "รูปภาพหลักฐานประกอบ",
+                modal_reply_title: "ตอบกลับเรื่องร้องเรียน",
+                modal_user_issue: "รายละเอียดปัญหาของผู้แจ้ง",
+                modal_type_reply: "พิมพ์ข้อความตอบกลับถึงผู้ใช้",
+                placeholder_reply: "พิมพ์ข้อความชี้แจงความคืบหน้า หรือวิธีแก้ไขปัญหา...",
+                btn_cancel: "ยกเลิก",
+                btn_send_reply: "ส่งข้อความตอบกลับ"
+            },
+            en: {
+                app_title: "Enterprise Help Desk System | Loei Rajabhat University",
+                university_name: "Loei Rajabhat University",
+                nav_submit: "Submit",
+                nav_history: "History",
+                nav_admin: "Admin",
+                nav_dashboard: "Dashboard",
+                nav_setting: "Settings",
+                form_heading: "Submit a Complaint / Feedback",
+                form_subheading: "Central university support system. Fast, secure, and trackable instantly in your history.",
+                label_reporter_status: "Reporter Status",
+                opt_select_reporter_status: "-- Select Reporter Status --",
+                opt_student: "👨‍🎓 Student",
+                opt_staff: "👩‍🏫 Faculty / Staff",
+                opt_external: "🌐 External / Visitor",
+                label_category: "Related Department / Faculty",
+                opt_select_cat: "-- Select Department / Faculty --",
+                group_faculties: "Faculties",
+                group_offices: "Offices & Support Units",
+                opt_other: "❓ Other Departments",
+                label_priority: "Priority Level",
+                opt_normal: "🟢 Normal (1-3 Working Days)",
+                opt_urgent: "🟡 Urgent (Within 24 Hours)",
+                opt_very_urgent: "🔴 Most Urgent (Immediate Fix)",
+                label_subject: "Subject",
+                placeholder_subject: "Enter a brief subject, e.g., Broken socket in classroom",
+                label_description: "Complaint Details",
+                placeholder_description: "Describe the incident or problem in detail...",
+                label_attachment: "Attach Evidence Image (Optional)",
+                text_file_upload: "Click to select evidence image file",
+                text_file_hint: "Supports JPG, PNG up to 5MB",
+                label_anonymous: "Submit Anonymously",
+                sub_anonymous: "Your personal information will be kept strictly confidential",
+                placeholder_fullname: "Full Name / Student ID",
+                placeholder_contact: "Phone Number or Email",
+                btn_submit: "Submit Complaint to University",
+                history_heading: "My Complaint History",
+                history_subheading: "Click on the card to view details and specific evidence images of each item",
+                admin_login_heading: "Administrator Login",
+                admin_login_sub: "Enter your username and password to access the admin dashboard",
+                label_username: "Username",
+                placeholder_username: "Enter username",
+                label_password: "Password",
+                placeholder_password: "Enter password",
+                btn_login: "Admin Login",
+                dash_heading: "Dashboard & Overview Statistics (Admin)",
+                dash_sub: "Summary of overall statistics and system complaint management",
+                btn_mock: "Generate Mock Data",
+                btn_clear: "Clear Data",
+                btn_logout: "Logout",
+                stat_total: "Total Tickets",
+                stat_pending: "In Progress",
+                stat_resolved: "Resolved",
+                graph_heading: "Complaint Status Proportion Overview Chart",
+                status_received: "Received",
+                status_in_progress: "In Progress",
+                status_completed: "Resolved",
+                placeholder_search: "Search ID, subject, or sender...",
+                filter_status: "Filter Status:",
+                opt_all: "All",
+                th_ticket: "Ticket ID",
+                th_subject_dept: "Subject / Dept",
+                th_evidence: "Evidence",
+                th_sender: "Sender & Status",
+                th_priority: "Priority",
+                th_status: "Status",
+                th_reply: "Reply",
+                th_manage: "Manage",
+                setting_heading: "System Settings & Features",
+                setting_sub: "Customize display modes, sound effects, language, and browser storage",
+                lang_settings_title: "System Language",
+                lang_select_label: "Select Preferred Language",
+                lang_select_sub: "Switch instantly between Thai and English",
+                appearance_title: "Display & Theme",
+                theme_mode_label: "Screen Theme",
+                theme_mode_sub: "Toggle between light and dark modes",
+                theme_light: "Light",
+                theme_dark: "Dark",
+                sepia_label: "Eye Care Mode (Sepia Tone)",
+                sepia_sub: "Warmer tone to reduce eye strain",
+                fontsize_label: "Website Font Size",
+                fontsize_sub: "Adjust font size for better readability",
+                font_normal: "Normal (Default)",
+                font_large: "Large",
+                font_xlarge: "Extra Large",
+                audio_title: "Sound & Effects",
+                sound_label: "Sound Effects (Sound FX)",
+                sound_sub: "Play sound on button click or successful submission",
+                storage_title: "Local Storage & Cache",
+                clear_history_label: "Clear Complaint History on This Device",
+                clear_history_sub: "Clear tracked ticket IDs stored in your browser",
+                btn_clear_history: "Clear My History",
+                modal_success_title: "Complaint Submitted Successfully!",
+                modal_success_sub: "Tracking ID has been saved to your history successfully",
+                btn_view_history: "View My History",
+                btn_ok: "OK",
+                modal_img_title: "Evidence Image",
+                modal_reply_title: "Reply to Complaint",
+                modal_user_issue: "User's Problem Details",
+                modal_type_reply: "Type reply message to user",
+                placeholder_reply: "Type progress update or resolution method...",
+                btn_cancel: "Cancel",
+                btn_send_reply: "Send Reply Message"
+            }
+        };
+
+        const STORAGE_KEY = 'lru_complaints_pinkblue_v3';
+        const MY_TICKETS_KEY = 'user_my_tickets_v3';
         let isAdminLoggedIn = sessionStorage.getItem('isAdminLoggedIn') === 'true';
 
+        let failedAttempts = 0;
+        const CORRECT_PIN = "admin123";
+        let soundFxEnabled = localStorage.getItem('lru_sound_fx') !== 'false';
+        let currentLang = localStorage.getItem('lru_lang') || 'th';
+
         document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            initSettingsUI();
+            switchLanguage(currentLang, false);
             updateAuthUI();
+            updateMyHistoryBadge();
         });
+
+        function switchLanguage(lang, showMsg = true) {
+            currentLang = lang;
+            localStorage.setItem('lru_lang', lang);
+            playClickSound();
+
+            const btnTh = document.getElementById('langBtnTh');
+            const btnEn = document.getElementById('langBtnEn');
+            if (btnTh && btnEn) {
+                if (lang === 'th') {
+                    btnTh.className = "px-4 py-2 rounded-xl font-bold transition-all flex items-center justify-center gap-2 shadow-sm bg-white text-pink-600";
+                    btnEn.className = "px-4 py-2 rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-slate-500 hover:text-slate-800 dark:hover:text-white";
+                } else {
+                    btnEn.className = "px-4 py-2 rounded-xl font-bold transition-all flex items-center justify-center gap-2 shadow-sm bg-white text-pink-600";
+                    btnTh.className = "px-4 py-2 rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-slate-500 hover:text-slate-800 dark:hover:text-white";
+                }
+            }
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.innerText = translations[lang][key];
+                }
+            });
+
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (translations[lang] && translations[lang][key]) {
+                    el.setAttribute('placeholder', translations[lang][key]);
+                }
+            });
+
+            document.querySelectorAll('[data-i18n-label]').forEach(el => {
+                const key = el.getAttribute('data-i18n-label');
+                if (translations[lang] && translations[lang][key]) {
+                    el.setAttribute('label', translations[lang][key]);
+                }
+            });
+
+            if (showMsg) {
+                showToast(lang === 'th' ? 'เปลี่ยนเป็นภาษาไทยเรียบร้อย' : 'Switched to English successfully', 'info');
+            }
+        }
+
+        function playClickSound() {
+            if (!soundFxEnabled) return;
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(580, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.08);
+                gainNode.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.08);
+            } catch (e) {}
+        }
+
+        function playSuccessChime() {
+            if (!soundFxEnabled) return;
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                [523.25, 659.25, 783.99, 1046.50].forEach((freq, index) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.08, audioCtx.currentTime + index * 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + index * 0.08 + 0.25);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(audioCtx.currentTime + index * 0.08);
+                    osc.stop(audioCtx.currentTime + index * 0.08 + 0.25);
+                });
+            } catch (e) {}
+        }
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('lru_theme') || 'light';
+            setThemeMode(savedTheme, false);
+
+            const savedSepia = localStorage.getItem('lru_sepia') === 'true';
+            if (savedSepia) {
+                document.body.classList.add('sepia-mode');
+            }
+
+            const savedFontSize = localStorage.getItem('lru_font_size') || 'normal';
+            setFontSize(savedFontSize, false);
+        }
+
+        function initSettingsUI() {
+            const sepiaToggle = document.getElementById('sepiaToggle');
+            if (sepiaToggle) {
+                sepiaToggle.checked = localStorage.getItem('lru_sepia') === 'true';
+            }
+
+            const soundToggle = document.getElementById('soundFxToggle');
+            if (soundToggle) {
+                soundToggle.checked = soundFxEnabled;
+            }
+
+            const fontSelect = document.getElementById('fontSizeSelect');
+            if (fontSelect) {
+                fontSelect.value = localStorage.getItem('lru_font_size') || 'normal';
+            }
+        }
+
+        function setThemeMode(mode, showMsg = true) {
+            playClickSound();
+            const btnLight = document.getElementById('themeBtnLight');
+            const btnDark = document.getElementById('themeBtnDark');
+
+            if (mode === 'dark') {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('lru_theme', 'dark');
+                if(btnLight && btnDark) {
+                    btnLight.className = "px-3.5 py-2 rounded-xl font-bold transition-all flex items-center justify-center gap-1.5 text-slate-400 hover:text-white";
+                    btnDark.className = "px-3.5 py-2 rounded-xl font-bold transition-all flex items-center justify-center gap-1.5 bg-slate-700 text-indigo-300 shadow-sm";
+                }
+                if(showMsg) showToast(currentLang === 'th' ? 'เปิดใช้งานโหมดมืดเรียบร้อย' : 'Dark mode enabled', 'info');
+            } else {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('lru_theme', 'light');
+                if(btnLight && btnDark) {
+                    btnDark.className = "px-3.5 py-2 rounded-xl font-bold transition-all flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-800";
+                    btnLight.className = "px-3.5 py-2 rounded-xl font-bold transition-all flex items-center justify-center gap-1.5 bg-white text-pink-600 shadow-sm";
+                }
+                if(showMsg) showToast(currentLang === 'th' ? 'เปิดใช้งานโหมดสว่างเรียบร้อย' : 'Light mode enabled', 'info');
+            }
+        }
+
+        function toggleSepiaMode(enabled) {
+            playClickSound();
+            if (enabled) {
+                document.body.classList.add('sepia-mode');
+                localStorage.setItem('lru_sepia', 'true');
+                showToast(currentLang === 'th' ? 'เปิดโหมดถนอมสายตาเรียบร้อย' : 'Eye care mode enabled', 'info');
+            } else {
+                document.body.classList.remove('sepia-mode');
+                localStorage.setItem('lru_sepia', 'false');
+                showToast(currentLang === 'th' ? 'ปิดโหมดถนอมสายตาแล้ว' : 'Eye care mode disabled', 'info');
+            }
+        }
+
+        function setFontSize(size, showMsg = true) {
+            playClickSound();
+            localStorage.setItem('lru_font_size', size);
+            const bodyEl = document.body;
+            bodyEl.classList.remove('text-sm', 'text-base', 'text-lg');
+
+            if (size === 'large') {
+                bodyEl.style.fontSize = '1.05rem';
+                if(showMsg) showToast(currentLang === 'th' ? 'ปรับขนาดตัวอักษรเป็น: ใหญ่' : 'Font size: Large', 'info');
+            } else if (size === 'xlarge') {
+                bodyEl.style.fontSize = '1.15rem';
+                if(showMsg) showToast(currentLang === 'th' ? 'ปรับขนาดตัวอักษรเป็น: ใหญ่มาก' : 'Font size: Extra Large', 'info');
+            } else {
+                bodyEl.style.fontSize = '1rem';
+                if(showMsg) showToast(currentLang === 'th' ? 'ปรับขนาดตัวอักษรเป็น: ปกติ' : 'Font size: Normal', 'info');
+            }
+        }
+
+        function toggleSoundFx(enabled) {
+            soundFxEnabled = enabled;
+            localStorage.setItem('lru_sound_fx', enabled);
+            if (enabled) {
+                showToast(currentLang === 'th' ? 'เปิดเสียงเอฟเฟกต์แล้ว' : 'Sound effects enabled', 'info');
+            } else {
+                showToast(currentLang === 'th' ? 'ปิดเสียงเอฟเฟกต์แล้ว' : 'Sound effects disabled', 'info');
+            }
+        }
+
+        function clearMyLocalTickets() {
+            playClickSound();
+            if (confirm(currentLang === 'th' ? 'คุณต้องการล้างประวัติการแจ้งเรื่องในเครื่องนี้ทั้งหมดใช่หรือไม่?' : 'Are you sure you want to clear your complaint history on this device?')) {
+                localStorage.removeItem(MY_TICKETS_KEY);
+                updateMyHistoryBadge();
+                showToast(currentLang === 'th' ? 'ล้างประวัติในเครื่องเรียบร้อยแล้ว' : 'Local history cleared successfully', 'info');
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            if(!container) return;
+            const toast = document.createElement('div');
+            
+            let bgClass = 'bg-pink-600 text-white';
+            let icon = 'fa-circle-check';
+            if(type === 'error') {
+                bgClass = 'bg-rose-600 text-white';
+                icon = 'fa-circle-xmark';
+            } else if(type === 'info') {
+                bgClass = 'bg-sky-600 text-white';
+                icon = 'fa-circle-info';
+            }
+
+            toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-2xl shadow-xl text-xs font-semibold animate-toast ${bgClass}`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-sm shrink-0"></i> <span class="truncate">${message}</span>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(50px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function updateCharCount(textarea) {
+            const len = textarea.value.length;
+            const counter = document.getElementById('charCount');
+            if(counter) counter.innerText = `${len} / 500 ${(currentLang === 'th' ? 'ตัวอักษร' : 'chars')}`;
+        }
+
+        function handleFileSelect(input) {
+            const display = document.getElementById('fileNameDisplay');
+            if(!display) return;
+            if(input.files && input.files[0]) {
+                const file = input.files[0];
+                if(file.size > 5 * 1024 * 1024) {
+                    showToast(currentLang === 'th' ? 'ขนาดไฟล์ใหญ่เกิน 5MB กรุณาเลือกใหม่' : 'File size exceeds 5MB limit', 'error');
+                    input.value = '';
+                    display.innerText = translations[currentLang].text_file_upload;
+                    display.classList.remove('text-pink-600', 'font-bold');
+                    return;
+                }
+                display.innerText = `${(currentLang === 'th' ? 'เลือกไฟล์แล้ว:' : 'Selected:')} ${file.name}`;
+                display.classList.add('text-pink-600', 'font-bold');
+            } else {
+                display.innerText = translations[currentLang].text_file_upload;
+                display.classList.remove('text-pink-600', 'font-bold');
+            }
+        }
+
+        function toggleAnonymous(isAnon) {
+            const contactFields = document.getElementById('contactFields');
+            const fullnameInput = document.getElementById('fullname');
+            const contactInput = document.getElementById('contact');
+            if(isAnon) {
+                contactFields.style.opacity = '0.4';
+                contactFields.style.pointerEvents = 'none';
+                fullnameInput.value = '';
+                contactInput.value = '';
+            } else {
+                contactFields.style.opacity = '1';
+                contactFields.style.pointerEvents = 'auto';
+            }
+        }
 
         function getComplaints() {
             return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
         }
 
         function saveComplaints(data) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                return true;
+            } catch (e) {
+                showToast(currentLang === 'th' ? 'พื้นที่จัดเก็บเต็ม (รูปภาพมีขนาดใหญ่เกินไป)' : 'Storage full (image too large)', 'error');
+                return false;
+            }
         }
 
-        function updateFileName(input) {
-            const display = document.getElementById('fileNameDisplay');
-            if(input.files && input.files[0]) {
-                display.innerText = `ไฟล์ที่เลือก: ${input.files[0].name}`;
-                display.classList.add('text-blue-700', 'font-bold');
-            } else {
-                display.innerText = 'คลิกเพื่ออัปโหลดไฟล์หลักฐาน (PDF, PNG, JPG ขนาดไม่เกิน 5MB)';
-                display.classList.remove('text-blue-700', 'font-bold');
+        function getMyTickets() {
+            return JSON.parse(localStorage.getItem(MY_TICKETS_KEY)) || [];
+        }
+
+        function addMyTicketId(ticketId) {
+            let myTickets = getMyTickets();
+            if (!myTickets.includes(ticketId)) {
+                myTickets.unshift(ticketId);
+                localStorage.setItem(MY_TICKETS_KEY, JSON.stringify(myTickets));
+                updateMyHistoryBadge();
+            }
+        }
+
+        function updateMyHistoryBadge() {
+            const myTickets = getMyTickets();
+            const badge = document.getElementById('myHistoryBadge');
+            if (badge) {
+                if (myTickets.length > 0) {
+                    badge.innerText = myTickets.length;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
             }
         }
 
         function updateAuthUI() {
-            const logoutBtn = document.getElementById('adminLogoutBtn');
-            const lockIcon = document.getElementById('adminLockIcon');
-            
+            const navContainer = document.getElementById('mainNav');
+            if (!navContainer) return;
+
             if (isAdminLoggedIn) {
-                logoutBtn.classList.remove('hidden');
-                lockIcon.className = "fa-solid fa-circle-check text-[10px] text-emerald-400";
+                navContainer.innerHTML = `
+                    <button onclick="switchTab('admin')" id="tab-admin" class="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl transition-all duration-300 shadow-sm bg-white dark:bg-slate-700 text-pink-600 dark:text-pink-400 flex items-center gap-1 transform active:scale-95 whitespace-nowrap">
+                        <i class="fa-solid fa-gauge-high text-pink-500"></i><span>${translations[currentLang].nav_dashboard}</span>
+                    </button>
+                    <button onclick="switchTab('setting')" id="tab-setting" class="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl transition-all duration-300 text-slate-600 dark:text-slate-300 hover:text-pink-600 flex items-center gap-1 transform active:scale-95 whitespace-nowrap">
+                        <i class="fa-solid fa-gear"></i><span>${translations[currentLang].nav_setting}</span>
+                    </button>
+                `;
             } else {
-                logoutBtn.classList.add('hidden');
-                lockIcon.className = "fa-solid fa-lock text-[10px] text-slate-400";
+                navContainer.innerHTML = `
+                    <button onclick="switchTab('submit')" id="tab-submit" class="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl transition-all duration-300 shadow-sm bg-white dark:bg-slate-700 text-pink-600 dark:text-pink-400 flex items-center gap-1 transform active:scale-95 whitespace-nowrap">
+                        <i class="fa-solid fa-pen-to-square"></i><span>${translations[currentLang].nav_submit}</span>
+                    </button>
+                    <button onclick="switchTab('my-history')" id="tab-my-history" class="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl transition-all duration-300 text-slate-600 dark:text-slate-300 hover:text-pink-600 flex items-center gap-1 transform active:scale-95 whitespace-nowrap">
+                        <i class="fa-solid fa-clock-rotate-left"></i><span>${translations[currentLang].nav_history}</span>
+                        <span id="myHistoryBadge" class="px-1.5 py-0.2 rounded-full bg-pink-500 text-white text-[9px] hidden">0</span>
+                    </button>
+                    <button onclick="switchTab('admin-login')" id="tab-admin-login" class="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl transition-all duration-300 text-slate-600 dark:text-slate-300 hover:text-pink-600 flex items-center gap-1 transform active:scale-95 whitespace-nowrap">
+                        <i class="fa-solid fa-lock text-pink-500"></i><span>${translations[currentLang].nav_admin}</span>
+                    </button>
+                    <button onclick="switchTab('setting')" id="tab-setting" class="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl transition-all duration-300 text-slate-600 dark:text-slate-300 hover:text-pink-600 flex items-center gap-1 transform active:scale-95 whitespace-nowrap">
+                        <i class="fa-solid fa-gear"></i><span>${translations[currentLang].nav_setting}</span>
+                    </button>
+                `;
+                updateMyHistoryBadge();
             }
-        }
-
-        function openAdminModal() {
-            document.getElementById('adminLoginModal').classList.remove('hidden');
-            document.getElementById('adminLoginModal').classList.add('flex');
-            document.getElementById('adminAuthError').classList.add('hidden');
-        }
-
-        function closeAdminModal() {
-            document.getElementById('adminLoginModal').classList.add('hidden');
-            document.getElementById('adminLoginModal').classList.remove('flex');
         }
 
         function handleAdminLogin(e) {
             e.preventDefault();
-            const user = document.getElementById('adminUser').value.trim();
+            playClickSound();
             const pass = document.getElementById('adminPass').value.trim();
+            const errEl = document.getElementById('adminAuthError');
 
-            if (user === 'admin' && pass === 'admin123') {
+            if (pass === CORRECT_PIN) {
                 isAdminLoggedIn = true;
+                failedAttempts = 0;
                 sessionStorage.setItem('isAdminLoggedIn', 'true');
-                closeAdminModal();
                 updateAuthUI();
                 switchTab('admin');
+                playSuccessChime();
+                showToast(currentLang === 'th' ? 'เข้าสู่ระบบแอดมินสำเร็จ' : 'Admin login successful', 'success');
+                if(errEl) errEl.classList.add('hidden');
             } else {
-                document.getElementById('adminAuthError').classList.remove('hidden');
+                failedAttempts++;
+                let warningText = currentLang === 'th' ? `รหัสผ่านไม่ถูกต้อง (ครั้งที่ ${failedAttempts})` : `Incorrect password (attempt ${failedAttempts})`;
+                if (failedAttempts === 3 && currentLang === 'th') warningText += "<br>⚠️ ยังไม่แก่เลยทำไมจำรหัสไม่ได้หนิ";
+                else if (failedAttempts === 5 && currentLang === 'th') warningText += "<br>⚠️ เริ่มจะแก่จริงๆแล้วแหละ";
+                else if (failedAttempts >= 6 && currentLang === 'th') warningText += "<br>⚠️ ยอมรับเถอะแก่จริงๆแหละ";
+
+                if(errEl) {
+                    errEl.innerHTML = warningText;
+                    errEl.classList.remove('hidden');
+                }
+                showToast(currentLang === 'th' ? 'รหัสผ่านไม่ถูกต้อง' : 'Incorrect password', 'error');
             }
         }
 
         function adminLogout() {
+            playClickSound();
             isAdminLoggedIn = false;
             sessionStorage.removeItem('isAdminLoggedIn');
             updateAuthUI();
             switchTab('submit');
+            showToast(currentLang === 'th' ? 'ออกจากระบบเรียบร้อยแล้ว' : 'Logged out successfully', 'info');
         }
 
         function switchTab(tab) {
+            playClickSound();
+            
             if (tab === 'admin' && !isAdminLoggedIn) {
-                openAdminModal();
+                showToast(currentLang === 'th' ? 'กรุณาเข้าสู่ระบบแอดมินก่อนใช้งานแดชบอร์ด' : 'Please login as admin first', 'error');
+                switchTab('admin-login');
                 return;
             }
 
-            ['submit', 'track', 'admin'].forEach(t => {
-                document.getElementById(`sec-${t}`).classList.add('hidden');
-                const btn = document.getElementById(`tab-${t}`);
-                btn.className = "px-3.5 py-1.5 rounded-lg transition-all text-slate-300 hover:text-white";
+            if (isAdminLoggedIn && (tab === 'submit' || tab === 'my-history' || tab === 'admin-login')) {
+                tab = 'admin';
+            }
+
+            ['submit', 'my-history', 'admin-login', 'admin', 'setting'].forEach(t => {
+                const sec = document.getElementById(`sec-${t}`);
+                if(sec) sec.classList.add('hidden');
             });
 
-            document.getElementById(`sec-${tab}`).classList.remove('hidden');
-            const activeBtn = document.getElementById(`tab-${tab}`);
-            activeBtn.className = "px-3.5 py-1.5 rounded-lg transition-all shadow-sm bg-blue-600 text-white font-semibold";
-
-            if (tab === 'admin') renderAdminDashboard();
-        }
-
-        function toggleAnonymous(isAnon) {
-            const fields = document.getElementById('contactFields');
-            if(isAnon) {
-                fields.classList.add('opacity-40', 'pointer-events-none');
-            } else {
-                fields.classList.remove('opacity-40', 'pointer-events-none');
+            const targetSec = document.getElementById(`sec-${tab}`);
+            if(targetSec) {
+                targetSec.classList.remove('hidden');
             }
+
+            if (tab === 'my-history') {
+                renderMyHistory();
+            } else if (tab === 'admin') {
+                renderAdminDashboard();
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function handleFormSubmit(e) {
             e.preventDefault();
-
-            const isAnon = document.getElementById('isAnonymous').checked;
-            const currentYear = new Date().getFullYear();
-            const ticketId = `TK-${currentYear}-${Math.floor(1000 + Math.random() * 9000)}`;
-            const fileInput = document.getElementById('evidence');
             
-            const newComplaint = {
-                id: ticketId,
-                category: document.getElementById('category').value,
-                priority: document.getElementById('priority').value,
-                subject: document.getElementById('subject').value,
-                incidentTime: document.getElementById('incidentTime').value || '-',
-                location: document.getElementById('location').value || '-',
-                description: document.getElementById('description').value,
-                userType: isAnon ? 'ไม่ระบุตัวตน' : document.getElementById('userType').value,
-                fullname: isAnon ? 'ไม่ระบุตัวตน (Anonymous)' : (document.getElementById('fullname').value || 'ไม่ระบุชื่อ'),
-                phone: isAnon ? '-' : (document.getElementById('phone').value || '-'),
-                email: isAnon ? '-' : (document.getElementById('email').value || '-'),
-                hasEvidence: fileInput.files.length > 0 ? fileInput.files[0].name : 'ไม่มี',
-                status: 'รับเรื่องแล้ว',
-                date: new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit' })
+            const reporterStatus = document.getElementById('reporterStatus').value;
+            const category = document.getElementById('category').value;
+            const priority = document.getElementById('priority').value;
+            const subject = document.getElementById('subject').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const isAnonymous = document.getElementById('isAnonymous').checked;
+            const fullname = document.getElementById('fullname').value.trim();
+            const contact = document.getElementById('contact').value.trim();
+            const fileInput = document.getElementById('attachment');
+
+            if (!reporterStatus) {
+                showToast(currentLang === 'th' ? 'กรุณาเลือกสถานะผู้แจ้งปัญหา' : 'Please select reporter status', 'error');
+                return;
+            }
+            if (!category) {
+                showToast(currentLang === 'th' ? 'กรุณาเลือกหน่วยงาน / คณะ' : 'Please select a department', 'error');
+                return;
+            }
+            if (!subject) {
+                showToast(currentLang === 'th' ? 'กรุณาระบุหัวข้อเรื่อง' : 'Please enter a subject', 'error');
+                return;
+            }
+            if (!description) {
+                showToast(currentLang === 'th' ? 'กรุณาระบุรายละเอียด' : 'Please enter details', 'error');
+                return;
+            }
+
+            const ticketId = '#LRU-' + Math.floor(1000 + Math.random() * 9000);
+            const now = new Date().toLocaleString('th-TH');
+
+            const processData = (imgData = '') => {
+                const newComplaint = {
+                    id: ticketId,
+                    reporterStatus: reporterStatus,
+                    category: category,
+                    priority: priority,
+                    subject: subject,
+                    description: description,
+                    isAnonymous: isAnonymous,
+                    fullname: isAnonymous ? 'ไม่ระบุตัวตน (Anonymous)' : (fullname || 'ไม่ระบุชื่อ'),
+                    contact: isAnonymous ? '-' : (contact || '-'),
+                    attachment: imgData,
+                    status: 'รับเรื่องแล้ว',
+                    adminReply: '',
+                    date: now
+                };
+
+                let list = getComplaints();
+                list.unshift(newComplaint);
+                if (saveComplaints(list)) {
+                    addMyTicketId(ticketId);
+                    playSuccessChime();
+                    
+                    document.getElementById('modalTicketId').innerText = ticketId;
+                    document.getElementById('successModal').classList.remove('hidden');
+                    document.getElementById('successModal').classList.add('flex');
+                }
             };
 
-            const complaints = getComplaints();
-            complaints.unshift(newComplaint);
-            saveComplaints(complaints);
-
-            document.getElementById('modalTicketId').innerText = `#${ticketId}`;
-            document.getElementById('successModal').classList.remove('hidden');
-            document.getElementById('successModal').classList.add('flex');
-
-            document.getElementById('complaintForm').reset();
-            updateFileName(fileInput);
-            toggleAnonymous(false);
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(uploadEvent) {
+                    processData(uploadEvent.target.result);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                processData('');
+            }
         }
 
         function closeModal() {
-            document.getElementById('successModal').classList.add('hidden');
+            playClickSound();
             document.getElementById('successModal').classList.remove('flex');
+            document.getElementById('successModal').classList.add('hidden');
+            document.getElementById('complaintForm').reset();
+            document.getElementById('fileNameDisplay').innerText = translations[currentLang].text_file_upload;
+            document.getElementById('fileNameDisplay').classList.remove('text-pink-600', 'font-bold');
+            document.getElementById('charCount').innerText = `0 / 500 ${(currentLang === 'th' ? 'ตัวอักษร' : 'chars')}`;
+            toggleAnonymous(false);
+            switchTab('submit');
         }
 
-        function trackComplaint() {
-            const input = document.getElementById('trackInput').value.trim().toUpperCase().replace('#', '');
-            const resultBox = document.getElementById('trackResult');
-            const complaints = getComplaints();
+        function closeModalToHistory() {
+            playClickSound();
+            document.getElementById('successModal').classList.remove('flex');
+            document.getElementById('successModal').classList.add('hidden');
+            document.getElementById('complaintForm').reset();
+            document.getElementById('fileNameDisplay').innerText = translations[currentLang].text_file_upload;
+            document.getElementById('fileNameDisplay').classList.remove('text-pink-600', 'font-bold');
+            document.getElementById('charCount').innerText = `0 / 500 ${(currentLang === 'th' ? 'ตัวอักษร' : 'chars')}`;
+            toggleAnonymous(false);
+            switchTab('my-history');
+        }
 
-            const found = complaints.find(c => c.id === input);
+        function renderMyHistory() {
+            const container = document.getElementById('myHistoryContainer');
+            if (!container) return;
 
-            resultBox.classList.remove('hidden');
-            if(!found) {
-                resultBox.innerHTML = `
-                    <div class="text-center py-6 text-slate-500">
-                        <i class="fa-solid fa-circle-xmark text-3xl mb-2 text-rose-500"></i>
-                        <p class="text-sm font-medium">ไม่พบข้อมูลรหัสอ้างอิงเรื่องร้องเรียนนี้</p>
-                        <p class="text-xs text-slate-400 mt-1">กรุณาตรวจสอบรหัสอ้างอิงใหม่อีกครั้ง</p>
+            const myTickets = getMyTickets();
+            const allComplaints = getComplaints();
+            const myData = allComplaints.filter(item => myTickets.includes(item.id));
+
+            if (myData.length === 0) {
+                container.innerHTML = `
+                    <div class="glass-card rounded-3xl p-8 text-center space-y-3">
+                        <div class="w-16 h-16 bg-pink-50 dark:bg-slate-800 text-pink-400 rounded-2xl flex items-center justify-center text-2xl mx-auto shadow-sm">
+                            <i class="fa-solid fa-folder-open"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-800 dark:text-white text-base">${currentLang === 'th' ? 'ยังไม่มีประวัติเรื่องร้องเรียนในเครื่องนี้' : 'No complaint history found'}</h3>
+                        <p class="text-xs text-slate-400">${currentLang === 'th' ? 'เมื่อคุณส่งเรื่องร้องเรียน รหัสติดตามจะบันทึกอัตโนมัติที่นี่' : 'Your submitted tickets will appear here automatically.'}</p>
                     </div>
                 `;
                 return;
             }
 
-            let statusBadge = 'bg-slate-100 text-slate-700 border-slate-300';
-            if(found.status === 'รับเรื่องแล้ว') statusBadge = 'bg-amber-50 text-amber-700 border-amber-200';
-            if(found.status === 'อยู่ระหว่างดำเนินการ') statusBadge = 'bg-blue-50 text-blue-700 border-blue-200';
-            if(found.status === 'เสร็จสิ้น/ยุติเรื่อง') statusBadge = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+            container.innerHTML = myData.map(item => {
+                let badgeClass = 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300';
+                if(item.status === 'กำลังดำเนินการ') badgeClass = 'bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300';
+                if(item.status === 'แก้ไขเรียบร้อย') badgeClass = 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300';
 
-            resultBox.innerHTML = `
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-                        <span class="font-mono text-xs font-bold text-slate-500">#${found.id}</span>
-                        <span class="px-2.5 py-1 rounded-md text-xs font-semibold border ${statusBadge}">${found.status}</span>
+                return `
+                    <div class="glass-card rounded-3xl p-5 space-y-3.5 shadow-md">
+                        <div class="flex items-center justify-between gap-2 border-b border-pink-100/60 dark:border-slate-800 pb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="font-mono font-extrabold text-pink-600 dark:text-pink-400 text-xs sm:text-sm bg-pink-50 dark:bg-slate-800 px-3 py-1 rounded-xl border border-pink-200 dark:border-slate-700">${item.id}</span>
+                                <span class="text-[11px] px-2.5 py-0.5 rounded-full font-semibold ${badgeClass}">${item.status}</span>
+                            </div>
+                            <span class="text-[11px] text-slate-400 font-medium"><i class="fa-regular fa-clock mr-1"></i>${item.date}</span>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-50 dark:bg-slate-800 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-slate-700">${item.reporterStatus || 'นักศึกษา'}</span>
+                                <span class="text-xs font-bold text-slate-500">${item.category}</span>
+                            </div>
+                            <h4 class="font-bold text-slate-900 dark:text-white text-sm sm:text-base">${item.subject}</h4>
+                            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed bg-white/60 dark:bg-slate-900/40 p-3 rounded-2xl border border-pink-100/40 dark:border-slate-800">${item.description}</p>
+                        </div>
+                        ${item.adminReply ? `
+                            <div class="p-3.5 rounded-2xl bg-sky-50 dark:bg-slate-800/80 border border-sky-200 dark:border-slate-700 space-y-1">
+                                <p class="text-[11px] font-bold text-sky-700 dark:text-sky-300 flex items-center gap-1.5"><i class="fa-solid fa-reply"></i> ${currentLang === 'th' ? 'ข้อความตอบกลับจากแอดมิน:' : 'Admin Reply:'}</p>
+                                <p class="text-xs text-slate-700 dark:text-slate-200 leading-relaxed">${item.adminReply}</p>
+                            </div>
+                        ` : ''}
+                        <div class="flex items-center justify-between pt-1 text-xs text-slate-500">
+                            <span><i class="fa-solid fa-user-shield mr-1"></i> ${item.fullname}</span>
+                            ${item.attachment ? `
+                                <button onclick="openImageModal('${item.attachment}')" class="px-3 py-1.5 bg-pink-50 hover:bg-pink-100 dark:bg-slate-800 text-pink-600 dark:text-pink-400 rounded-xl font-semibold transition-all flex items-center gap-1.5 border border-pink-200 dark:border-slate-700 shadow-sm">
+                                    <i class="fa-solid fa-image"></i> ${currentLang === 'th' ? 'ดูหลักฐาน' : 'View Evidence'}
+                                </button>
+                            ` : `<span class="text-slate-400 text-[11px]">${currentLang === 'th' ? 'ไม่มีรูปภาพหลักฐาน' : 'No attachment'}</span>`}
+                        </div>
                     </div>
-                    <h4 class="font-bold text-slate-800 text-sm sm:text-base">${found.subject}</h4>
-                    <p class="text-xs text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-200 leading-relaxed">${found.description}</p>
-                    
-                    <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-500 pt-1">
-                        <div><span class="font-semibold text-slate-700">หมวดหมู่:</span> ${found.category}</div>
-                        <div><span class="font-semibold text-slate-700">ระดับความเร่งด่วน:</span> ${found.priority}</div>
-                        <div><span class="font-semibold text-slate-700">สถานที่:</span> ${found.location}</div>
-                        <div><span class="font-semibold text-slate-700">วันที่ยื่นเรื่อง:</span> ${found.date}</div>
-                    </div>
-                </div>
-            `;
+                `;
+            }).join('');
+        }
+
+        function openImageModal(imgSrc) {
+            playClickSound();
+            document.getElementById('modalImagePreview').src = imgSrc;
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeImageModal() {
+            playClickSound();
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
         }
 
         function renderAdminDashboard() {
-            const complaints = getComplaints();
+            const list = getComplaints();
+            const searchVal = document.getElementById('adminSearchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('adminStatusFilter').value;
+
+            const total = list.length;
+            const pending = list.filter(i => i.status === 'รับเรื่องแล้ว' || i.status === 'กำลังดำเนินการ').length;
+            const resolved = list.filter(i => i.status === 'แก้ไขเรียบร้อย').length;
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-pending').innerText = pending;
+            document.getElementById('stat-resolved').innerText = resolved;
+
+            const receivedCount = list.filter(i => i.status === 'รับเรื่องแล้ว').length;
+            const inProgressCount = list.filter(i => i.status === 'กำลังดำเนินการ').length;
+            const resolvedCount = list.filter(i => i.status === 'แก้ไขเรียบร้อย').length;
+
+            const pRec = total > 0 ? Math.round((receivedCount / total) * 100) : 0;
+            const pPro = total > 0 ? Math.round((inProgressCount / total) * 100) : 0;
+            const pRes = total > 0 ? Math.round((resolvedCount / total) * 100) : 0;
+
+            document.getElementById('graph-percent-received').innerText = `${pRec}%`;
+            document.getElementById('graph-bar-received').style.width = `${pRec}%`;
+
+            document.getElementById('graph-percent-pending').innerText = `${pPro}%`;
+            document.getElementById('graph-bar-pending').style.width = `${pPro}%`;
+
+            document.getElementById('graph-percent-resolved').innerText = `${pRes}%`;
+            document.getElementById('graph-bar-resolved').style.width = `${pRes}%`;
+
+            const filtered = list.filter(item => {
+                const matchSearch = item.id.toLowerCase().includes(searchVal) ||
+                                    item.subject.toLowerCase().includes(searchVal) ||
+                                    item.fullname.toLowerCase().includes(searchVal) ||
+                                    item.category.toLowerCase().includes(searchVal);
+                const matchStatus = statusFilter === 'ALL' || item.status === statusFilter;
+                return matchSearch && matchStatus;
+            });
+
             const tbody = document.getElementById('adminTableBody');
+            if(!tbody) return;
 
-            document.getElementById('stat-total').innerText = complaints.length;
-            document.getElementById('stat-pending').innerText = complaints.filter(c => c.status === 'รับเรื่องแล้ว').length;
-            document.getElementById('stat-processing').innerText = complaints.filter(c => c.status === 'อยู่ระหว่างดำเนินการ').length;
-            document.getElementById('stat-resolved').innerText = complaints.filter(c => c.status === 'เสร็จสิ้น/ยุติเรื่อง').length;
-
-            if(complaints.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">ยังไม่มีรายการเรื่องร้องเรียนในระบบ</td></tr>`;
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="p-8 text-center text-slate-400 text-xs sm:text-sm">
+                            <i class="fa-solid fa-circle-exclamation text-xl mb-1 text-pink-400 block"></i>
+                            ${currentLang === 'th' ? 'ไม่พบรายการเรื่องร้องเรียนในระบบ' : 'No complaints found'}
+                        </td>
+                    </tr>
+                `;
                 return;
             }
 
-            tbody.innerHTML = complaints.map(c => {
-                let priorityClass = 'bg-slate-100 text-slate-600';
-                if(c.priority === 'ด่วน') priorityClass = 'bg-amber-50 text-amber-700 border border-amber-200';
-                if(c.priority === 'ด่วนที่สุด') priorityClass = 'bg-rose-50 text-rose-700 border border-rose-200';
+            tbody.innerHTML = filtered.map(item => {
+                let pColor = 'bg-emerald-100 text-emerald-700';
+                if(item.priority === 'ด่วน') pColor = 'bg-amber-100 text-amber-700';
+                if(item.priority === 'ด่วนที่สุด') pColor = 'bg-rose-100 text-rose-700 animate-pulse';
 
                 return `
-                    <tr class="hover:bg-slate-50 transition-all">
-                        <td class="p-3.5 font-mono font-bold text-blue-900">${c.id}</td>
-                        <td class="p-3.5">
-                            <div class="font-semibold text-slate-800">${c.subject}</div>
-                            <div class="text-[11px] text-slate-500">${c.category}</div>
+                    <tr class="hover:bg-pink-50/50 dark:hover:bg-slate-800/50 transition-colors border-b border-pink-50 dark:border-slate-800">
+                        <td class="p-3.5 sm:p-4 font-mono font-bold text-pink-600 dark:text-pink-400 whitespace-nowrap">${item.id}</td>
+                        <td class="p-3.5 sm:p-4">
+                            <p class="font-bold text-slate-900 dark:text-white line-clamp-1">${item.subject}</p>
+                            <p class="text-[11px] text-slate-400">${item.category}</p>
                         </td>
-                        <td class="p-3.5">
-                            <div class="font-medium text-slate-700">${c.fullname}</div>
-                            <div class="text-[10px] text-slate-400">${c.userType}</div>
+                        <td class="p-3.5 sm:p-4 whitespace-nowrap">
+                            ${item.attachment ? `
+                                <button onclick="openImageModal('${item.attachment}')" class="px-2.5 py-1 bg-pink-50 text-pink-600 dark:bg-slate-800 dark:text-pink-400 rounded-lg text-xs font-semibold hover:bg-pink-100 transition-all border border-pink-200 dark:border-slate-700 shadow-sm">
+                                    <i class="fa-solid fa-image"></i> ดูรูป
+                                </button>
+                            ` : `<span class="text-slate-400 text-xs">ไม่มี</span>`}
                         </td>
-                        <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[10px] font-semibold ${priorityClass}">${c.priority}</span></td>
-                        <td class="p-3.5">
-                            <select onchange="updateStatus('${c.id}', this.value)" class="text-xs font-medium px-2 py-1 rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-1 focus:ring-blue-600">
-                                <option value="รับเรื่องแล้ว" ${c.status === 'รับเรื่องแล้ว' ? 'selected' : ''}>🟠 รับเรื่องแล้ว</option>
-                                <option value="อยู่ระหว่างดำเนินการ" ${c.status === 'อยู่ระหว่างดำเนินการ' ? 'selected' : ''}>🔵 อยู่ระหว่างดำเนินการ</option>
-                                <option value="เสร็จสิ้น/ยุติเรื่อง" ${c.status === 'เสร็จสิ้น/ยุติเรื่อง' ? 'selected' : ''}>🟢 เสร็จสิ้น/ยุติเรื่อง</option>
+                        <td class="p-3.5 sm:p-4">
+                            <div class="flex items-center gap-1.5 mb-0.5">
+                                <span class="text-[10px] font-bold px-2 py-0.2 rounded bg-purple-50 dark:bg-slate-800 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-slate-700">${item.reporterStatus || 'นักศึกษา'}</span>
+                            </div>
+                            <p class="font-semibold text-slate-800 dark:text-slate-200 text-xs">${item.fullname}</p>
+                            <p class="text-[11px] text-slate-400 font-mono">${item.contact}</p>
+                        </td>
+                        <td class="p-3.5 sm:p-4 whitespace-nowrap">
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${pColor}">${item.priority}</span>
+                        </td>
+                        <td class="p-3.5 sm:p-4 whitespace-nowrap">
+                            <select onchange="updateTicketStatus('${item.id}', this.value)" class="px-2.5 py-1.5 rounded-xl border border-pink-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm cursor-pointer">
+                                <option value="รับเรื่องแล้ว" ${item.status === 'รับเรื่องแล้ว' ? 'selected' : ''}>🟠 รับเรื่องแล้ว</option>
+                                <option value="กำลังดำเนินการ" ${item.status === 'กำลังดำเนินการ' ? 'selected' : ''}>🔵 กำลังดำเนินการ</option>
+                                <option value="แก้ไขเรียบร้อย" ${item.status === 'แก้ไขเรียบร้อย' ? 'selected' : ''}>🟢 แก้ไขเรียบร้อย</option>
                             </select>
                         </td>
-                        <td class="p-3.5 text-center">
-                            <button onclick="deleteTicket('${c.id}')" title="ลบรายการ" class="w-7 h-7 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-all">
+                        <td class="p-3.5 sm:p-4 text-center whitespace-nowrap">
+                            <button onclick="openReplyModal('${item.id}')" class="px-3 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-600 dark:bg-slate-800 dark:text-sky-400 rounded-xl text-xs font-bold transition-all border border-sky-200 dark:border-slate-700 shadow-sm">
+                                <i class="fa-solid fa-comment-dots mr-1"></i> ตอบกลับ ${item.adminReply ? '✓' : ''}
+                            </button>
+                        </td>
+                        <td class="p-3.5 sm:p-4 text-center whitespace-nowrap">
+                            <button onclick="deleteTicket('${item.id}')" class="w-8 h-8 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-slate-800 dark:text-rose-400 transition-all border border-rose-200 dark:border-slate-700 shadow-sm inline-flex items-center justify-center">
                                 <i class="fa-solid fa-trash-can text-xs"></i>
                             </button>
                         </td>
@@ -605,25 +1610,116 @@
             }).join('');
         }
 
-        function updateStatus(id, newStatus) {
-            let complaints = getComplaints();
-            complaints = complaints.map(c => c.id === id ? {...c, status: newStatus} : c);
-            saveComplaints(complaints);
-            renderAdminDashboard();
-        }
-
-        function deleteTicket(id) {
-            if(confirm(`ยืนยันการลบรายการเรื่องร้องเรียน #${id} หรือไม่?`)) {
-                let complaints = getComplaints();
-                complaints = complaints.filter(c => c.id !== id);
-                saveComplaints(complaints);
+        function updateTicketStatus(id, newStatus) {
+            playClickSound();
+            let list = getComplaints();
+            const index = list.findIndex(i => i.id === id);
+            if (index !== -1) {
+                list[index].status = newStatus;
+                saveComplaints(list);
+                showToast(currentLang === 'th' ? `อัปเดตสถานะ ${id} เป็น "${newStatus}" เรียบร้อย` : `Status updated to ${newStatus}`, 'success');
                 renderAdminDashboard();
             }
         }
 
+        function openReplyModal(id) {
+            playClickSound();
+            let list = getComplaints();
+            const item = list.find(i => i.id === id);
+            if (!item) return;
+
+            document.getElementById('replyTicketTitle').innerText = `${currentLang === 'th' ? 'ตอบกลับเรื่อง:' : 'Reply to:'} ${item.subject}`;
+            document.getElementById('replyTicketSub').innerText = `${currentLang === 'th' ? 'รหัส Ticket:' : 'Ticket ID:'} ${item.id} | ${item.category}`;
+            document.getElementById('replyTicketDesc').innerText = item.description;
+            document.getElementById('adminReplyText').value = item.adminReply || '';
+            document.getElementById('currentReplyId').value = item.id;
+
+            const modal = document.getElementById('replyModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeReplyModal() {
+            playClickSound();
+            const modal = document.getElementById('replyModal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        function submitAdminReply() {
+            playClickSound();
+            const id = document.getElementById('currentReplyId').value;
+            const replyText = document.getElementById('adminReplyText').value.trim();
+
+            let list = getComplaints();
+            const index = list.findIndex(i => i.id === id);
+            if (index !== -1) {
+                list[index].adminReply = replyText;
+                if (list[index].status === 'รับเรื่องแล้ว') {
+                    list[index].status = 'กำลังดำเนินการ';
+                }
+                saveComplaints(list);
+                closeReplyModal();
+                showToast(currentLang === 'th' ? 'บันทึกข้อความตอบกลับสำเร็จ' : 'Reply sent successfully', 'success');
+                renderAdminDashboard();
+            }
+        }
+
+        function deleteTicket(id) {
+            playClickSound();
+            if (confirm(currentLang === 'th' ? `คุณต้องการลบเรื่องร้องเรียนรหัส ${id} ใช่หรือไม่?` : `Are you sure you want to delete ${id}?`)) {
+                let list = getComplaints();
+                list = list.filter(i => i.id !== id);
+                saveComplaints(list);
+                showToast(currentLang === 'th' ? 'ลบรายการเรียบร้อยแล้ว' : 'Item deleted', 'info');
+                renderAdminDashboard();
+            }
+        }
+
+        function generateMockData() {
+            playClickSound();
+            const mock = [
+                {
+                    id: '#LRU-9421',
+                    reporterStatus: 'นักศึกษา',
+                    category: 'สำนักวิทยบริการและเทคโนโลยีสารสนเทศ',
+                    priority: 'ด่วน',
+                    subject: 'Wi-Fi อาคารเรียนรวม 1 หลุดบ่อยมาก',
+                    description: 'เชื่อมต่ออินเทอร์เน็ตของมหาวิทยาลัยไม่ได้เลยในช่วงบ่าย หลุดตลอดเวลา',
+                    isAnonymous: false,
+                    fullname: 'นายสมชาย ใจดี (65410123)',
+                    contact: '081-234-5678',
+                    attachment: '',
+                    status: 'กำลังดำเนินการ',
+                    adminReply: 'เจ้าหน้าที่กำลังตรวจสอบสัญญาณ Access Point ชั้น 3 ครับ',
+                    date: '22/9/2026, 09:15:00'
+                },
+                {
+                    id: '#LRU-8812',
+                    reporterStatus: 'อาจารย์ / บุคลากร',
+                    category: 'คณะครุศาสตร์',
+                    priority: 'ปกติ',
+                    subject: 'ขอเบิกอุปกรณ์โปรเจคเตอร์ห้อง 302',
+                    description: 'สาย HDMI เชื่อมต่อโปรเจคเตอร์มีอาการภาพกระพริบ รบกวนช่วยตรวจสอบ',
+                    isAnonymous: false,
+                    fullname: 'อ.ดร.วิชัย รักเรียน',
+                    contact: 'vichai@lru.ac.th',
+                    attachment: '',
+                    status: 'รับเรื่องแล้ว',
+                    adminReply: '',
+                    date: '21/9/2026, 14:30:00'
+                }
+            ];
+            saveComplaints(mock);
+            showToast(currentLang === 'th' ? 'สร้างข้อมูลตัวอย่างเรียบร้อย' : 'Mock data generated', 'success');
+            renderAdminDashboard();
+        }
+
         function clearAllData() {
-            if(confirm('คุณต้องการลบข้อมูลเรื่องร้องเรียนทั้งหมดใช่หรือไม่?')) {
+            playClickSound();
+            if (confirm(currentLang === 'th' ? 'คุณต้องการล้างข้อมูลเรื่องร้องเรียนทั้งหมดในระบบใช่หรือไม่?' : 'Clear all system data?')) {
                 localStorage.removeItem(STORAGE_KEY);
+                showToast(currentLang === 'th' ? 'ล้างข้อมูลทั้งหมดแล้ว' : 'All data cleared', 'info');
                 renderAdminDashboard();
             }
         }
