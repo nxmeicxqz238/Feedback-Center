@@ -13,7 +13,27 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Firebase SDK (Modular หรือ App / Database ตามโครงสร้างที่ใช้งาน) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
     <script>
+        // ตั้งค่า Firebase Config ที่คุณต้องการรวมไว้
+        const firebaseConfig = {
+            apiKey: "AIzaSyANW80fkZjaaQmCqjiPCAfsECfXdHfbEPA",
+            authDomain: "final-b282d.firebaseapp.com",
+            databaseURL: "https://final-b282d-default-rtdb.firebaseio.com",
+            projectId: "final-b282d",
+            storageBucket: "final-b282d.firebasestorage.app",
+            messagingSenderId: "1032442271501",
+            appId: "1:1032442271501:web:094ac7162bc01fd72d8244",
+            measurementId: "G-SPNGXZ9EJ2"
+        };
+
+        // เริ่มต้นใช้งาน Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
         tailwind.config = {
             darkMode: 'class',
             theme: {
@@ -50,7 +70,6 @@
             background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #090d16 100%);
         }
 
-        /* ฟังก์ชันโหมดถนอมสายตา (Sepia Warm Tone) */
         body.sepia-mode {
             filter: sepia(0.3) hue-rotate(-10deg);
         }
@@ -168,11 +187,11 @@
 
             <form id="complaintForm" onsubmit="handleFormSubmit(event)" class="glass-card rounded-[2rem] sm:rounded-[2.5rem] p-5 sm:p-10 space-y-5 sm:space-y-6">
                 
-                <!-- เพิ่มสถานะของผู้แจ้งปัญหา -->
+                <!-- สถานะของผู้แจ้งปัญหา -->
                 <div>
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2"><span data-i18n="label_reporter_status">สถานะผู้แจ้งปัญหา</span> <span class="text-rose-500">*</span></label>
                     <div class="relative">
-                        <select id="reporterStatus" class="w-full px-4.5 py-3.5 rounded-2xl border border-pink-200/90 dark:border-slate-700 bg-white/95 dark:bg-slate-800 dark:text-white focus:bg-white focus:ring-4 focus:ring-pink-500/20 focus:border-pink-500 focus:outline-none text-xs sm:text-sm appearance-none cursor-pointer shadow-sm">
+                        <select id="userStatus" class="w-full px-4.5 py-3.5 rounded-2xl border border-pink-200/90 dark:border-slate-700 bg-white/95 dark:bg-slate-800 dark:text-white focus:bg-white focus:ring-4 focus:ring-pink-500/20 focus:border-pink-500 focus:outline-none text-xs sm:text-sm appearance-none cursor-pointer shadow-sm">
                             <option value="" data-i18n="opt_select_reporter_status">-- เลือกสถานะผู้แจ้งปัญหา --</option>
                             <option value="นักศึกษา" data-i18n="opt_student">👨‍🎓 นักศึกษา</option>
                             <option value="อาจารย์ / บุคลากร" data-i18n="opt_staff">👩‍🏫 อาจารย์ / บุคลากร</option>
@@ -188,7 +207,7 @@
                     <div>
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2"><span data-i18n="label_category">หน่วยงาน / คณะที่เกี่ยวข้อง</span> <span class="text-rose-500">*</span></label>
                         <div class="relative">
-                            <select id="category" class="w-full px-4.5 py-3.5 rounded-2xl border border-pink-200/90 dark:border-slate-700 bg-white/95 dark:bg-slate-800 dark:text-white focus:bg-white focus:ring-4 focus:ring-pink-500/20 focus:border-pink-500 focus:outline-none text-xs sm:text-sm appearance-none cursor-pointer shadow-sm">
+                            <select id="department" class="w-full px-4.5 py-3.5 rounded-2xl border border-pink-200/90 dark:border-slate-700 bg-white/95 dark:bg-slate-800 dark:text-white focus:bg-white focus:ring-4 focus:ring-pink-500/20 focus:border-pink-500 focus:outline-none text-xs sm:text-sm appearance-none cursor-pointer shadow-sm">
                                 <option value="" data-i18n="opt_select_cat">-- เลือกหน่วยงาน / คณะ --</option>
                                 <optgroup label="คณะวิชา" data-i18n-label="group_faculties">
                                     <option value="คณะครุศาสตร์">🎓 คณะครุศาสตร์</option>
@@ -215,7 +234,7 @@
                     <div>
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2"><span data-i18n="label_priority">ระดับความเร่งด่วน</span> <span class="text-rose-500">*</span></label>
                         <div class="relative">
-                            <select id="priority" class="w-full px-4.5 py-3.5 rounded-2xl border border-pink-200/90 dark:border-slate-700 bg-white/95 dark:bg-slate-800 dark:text-white focus:bg-white focus:ring-4 focus:ring-pink-500/20 focus:border-pink-500 focus:outline-none text-xs sm:text-sm appearance-none cursor-pointer shadow-sm">
+                            <select id="complaintUrgency" class="w-full px-4.5 py-3.5 rounded-2xl border border-pink-200/90 dark:border-slate-700 bg-white/95 dark:bg-slate-800 dark:text-white focus:bg-white focus:ring-4 focus:ring-pink-500/20 focus:border-pink-500 focus:outline-none text-xs sm:text-sm appearance-none cursor-pointer shadow-sm">
                                 <option value="ปกติ" data-i18n="opt_normal">🟢 ปกติ (1-3 วันทำการ)</option>
                                 <option value="ด่วน" data-i18n="opt_urgent">🟡 ด่วน (ภายใน 24 ชม.)</option>
                                 <option value="ด่วนที่สุด" data-i18n="opt_very_urgent">🔴 ด่วนที่สุด (แก้ไขทันที)</option>
@@ -229,7 +248,7 @@
 
                 <div>
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2"><span data-i18n="label_subject">หัวข้อเรื่อง</span> <span class="text-rose-500">*</span></label>
-                    <input type="text" id="subject" data-i18n-placeholder="placeholder_subject" placeholder="ระบุหัวข้อเรื่องสั้นๆ ให้ชัดเจน เช่น ปลั๊กไฟในห้องเรียนเสีย" class="w-full px-4.5 py-3.5 rounded-2xl border border-pink-200/90 dark:border-slate-700 bg-white/95 dark:bg-slate-800 dark:text-white focus:bg-white focus:ring-4 focus:ring-pink-500/20 focus:border-pink-500 focus:outline-none text-xs sm:text-sm shadow-sm">
+                    <input type="text" id="complaintTitle" data-i18n-placeholder="placeholder_subject" placeholder="ระบุหัวข้อเรื่องสั้นๆ ให้ชัดเจน เช่น ปลั๊กไฟในห้องเรียนเสีย" class="w-full px-4.5 py-3.5 rounded-2xl border border-pink-200/90 dark:border-slate-700 bg-white/95 dark:bg-slate-800 dark:text-white focus:bg-white focus:ring-4 focus:ring-pink-500/20 focus:border-pink-500 focus:outline-none text-xs sm:text-sm shadow-sm">
                 </div>
 
                 <div>
@@ -237,7 +256,7 @@
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider"><span data-i18n="label_description">รายละเอียดเรื่องร้องเรียน</span> <span class="text-rose-500">*</span></label>
                         <span id="charCount" class="text-[11px] text-slate-400 font-medium">0 / 500 ตัวอักษร</span>
                     </div>
-                    <textarea id="description" rows="4" maxlength="500" oninput="updateCharCount(this)" data-i18n-placeholder="placeholder_description" placeholder="อธิบายรายละเอียด เหตุการณ์ หรือปัญหาที่พบเจอให้ครบถ้วน..." class="w-full px-4.5 py-3.5 rounded-2xl border border-pink-200/90 dark:border-slate-700 bg-white/95 dark:bg-slate-800 dark:text-white focus:bg-white focus:ring-4 focus:ring-pink-500/20 focus:border-pink-500 focus:outline-none text-xs sm:text-sm resize-none shadow-sm"></textarea>
+                    <textarea id="complaintDetail" rows="4" maxlength="500" oninput="updateCharCount(this)" data-i18n-placeholder="placeholder_description" placeholder="อธิบายรายละเอียด เหตุการณ์ หรือปัญหาที่พบเจอให้ครบถ้วน..." class="w-full px-4.5 py-3.5 rounded-2xl border border-pink-200/90 dark:border-slate-700 bg-white/95 dark:bg-slate-800 dark:text-white focus:bg-white focus:ring-4 focus:ring-pink-500/20 focus:border-pink-500 focus:outline-none text-xs sm:text-sm resize-none shadow-sm"></textarea>
                 </div>
 
                 <div>
@@ -270,7 +289,7 @@
 
                     <div id="contactFields" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 transition-all duration-300">
                         <div>
-                            <input type="text" id="fullname" data-i18n-placeholder="placeholder_fullname" placeholder="ชื่อ-นามสกุล / รหัสนักศึกษา" class="w-full px-4.5 py-3 rounded-xl border border-pink-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm">
+                            <input type="text" id="userName" data-i18n-placeholder="placeholder_fullname" placeholder="ชื่อ-นามสกุล / รหัสนักศึกษา" class="w-full px-4.5 py-3 rounded-xl border border-pink-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm">
                         </div>
                         <div>
                             <input type="text" id="contact" data-i18n-placeholder="placeholder_contact" placeholder="เบอร์โทรศัพท์ หรือ อีเมลติดต่อ" class="w-full px-4.5 py-3 rounded-xl border border-pink-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm">
@@ -314,13 +333,13 @@
                 <div id="loginFormContainer">
                     <form onsubmit="handleAdminLogin(event)" class="space-y-4">
                         <div>
-    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5" data-i18n="label_username">ชื่อผู้ใช้ (Username)</label>
-    <input type="text" id="adminUser" required data-i18n-placeholder="placeholder_username" placeholder="ระบุชื่อผู้ใช้" class="w-full px-4.5 py-3.5 rounded-2xl border border-pink-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm">
-</div>
-<div>
-    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5" data-i18n="label_password">รหัสผ่าน (Password)</label>
-    <input type="password" id="adminPass" required data-i18n-placeholder="placeholder_password" placeholder="ระบุรหัสผ่าน" class="w-full px-4.5 py-3.5 rounded-2xl border border-pink-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm" autocomplete="off">
-</div>
+                            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5" data-i18n="label_username">ชื่อผู้ใช้ (Username)</label>
+                            <input type="text" id="adminUser" required data-i18n-placeholder="placeholder_username" placeholder="ระบุชื่อผู้ใช้" class="w-full px-4.5 py-3.5 rounded-2xl border border-pink-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5" data-i18n="label_password">รหัสผ่าน (Password)</label>
+                            <input type="password" id="adminPass" required data-i18n-placeholder="placeholder_password" placeholder="ระบุรหัสผ่าน" class="w-full px-4.5 py-3.5 rounded-2xl border border-pink-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm" autocomplete="off">
+                        </div>
                         
                         <p id="adminAuthError" class="text-xs text-rose-500 hidden font-medium text-center bg-rose-50 dark:bg-slate-800 py-2.5 rounded-xl border border-rose-200 leading-relaxed"></p>
                         
@@ -474,9 +493,7 @@
                 <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm" data-i18n="setting_sub">ปรับแต่งโหมดการแสดงผล เสียงเอฟเฟกต์ ภาษา และจัดการข้อมูลส่วนตัวในเบราว์เซอร์ของคุณ</p>
             </div>
 
-            <!-- กล่องตั้งค่าหลัก -->
             <div class="grid grid-cols-1 gap-5">
-
                 <!-- ภาษาของระบบ -->
                 <div class="glass-card rounded-3xl p-5 sm:p-6 space-y-4 shadow-lg relative overflow-hidden group">
                     <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl group-hover:bg-purple-500/10 transition-all pointer-events-none"></div>
@@ -518,7 +535,6 @@
                         <span class="text-[10px] bg-pink-100/80 dark:bg-slate-700 text-pink-700 dark:text-pink-300 px-3 py-1 rounded-full font-bold uppercase tracking-wider">UI Theme</span>
                     </div>
 
-                    <!-- Dark / Light Mode -->
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-1">
                         <div>
                             <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 block" data-i18n="theme_mode_label">โหมดหน้าจอ (Theme)</span>
@@ -534,7 +550,6 @@
                         </div>
                     </div>
 
-                    <!-- Eye Care / Sepia Mode -->
                     <div class="flex items-center justify-between py-3 border-t border-pink-100/60 dark:border-slate-800/60">
                         <div>
                             <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 block" data-i18n="sepia_label">โหมดถนอมสายตา (Sepia Tone)</span>
@@ -546,7 +561,6 @@
                         </label>
                     </div>
 
-                    <!-- Font Size Scaling -->
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-2 border-t border-pink-100/60 dark:border-slate-800/60">
                         <div>
                             <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 block" data-i18n="fontsize_label">ขนาดตัวอักษรเว็บไซต์</span>
@@ -614,13 +628,6 @@
                         </button>
                     </div>
                 </div>
-
-            </div>
-
-            <!-- System Version Footer Info -->
-            <div class="p-4 bg-pink-50/70 dark:bg-slate-900/60 rounded-2xl border border-pink-100 dark:border-slate-800 text-center space-y-1 shadow-inner">
-                <p class="text-xs font-bold text-pink-600 dark:text-pink-400"><i class="fa-solid fa-shield-halved mr-1"></i> LRU Help Desk System v3.5 Professional</p>
-                <p class="text-[11px] text-slate-400" data-i18n="university_name">มหาวิทยาลัยราชภัฏเลย (Loei Rajabhat University)</p>
             </div>
         </section>
 
@@ -794,7 +801,7 @@
                 font_xlarge: "ใหญ่มาก (Extra Large)",
                 audio_title: "เสียงและเอฟเฟกต์",
                 sound_label: "เสียงกดปุ่มและแจ้งเตือน (Sound FX)",
-                sound_sub: "เล่นเสียงเมื่อคลิกปุ่มหรือส่งข้อมูลสำเร็จ",
+                sound_sub: "เปิด/ปิดเสียงตอบสนองเวลากดปุ่มในระบบ",
                 storage_title: "ข้อมูลและแคชในเครื่อง",
                 clear_history_label: "ล้างประวัติการแจ้งเรื่องในเครื่องนี้",
                 clear_history_sub: "ล้างรหัสติดตามเรื่องร้องเรียนที่บันทึกไว้ในเบราว์เซอร์",
@@ -920,9 +927,7 @@
         const STORAGE_KEY = 'lru_complaints_pinkblue_v3';
         const MY_TICKETS_KEY = 'user_my_tickets_v3';
         
-        // ปรับแก้ให้ใช้ sessionStorage เพื่อให้ระบบต้องล็อกอินใหม่ทุกครั้งที่เปิดเข้าเว็บใหม่หรือปิดแท็บ
         let isAdminLoggedIn = sessionStorage.getItem('isAdminLoggedIn') === 'true';
-
         let failedAttempts = 0;
         const CORRECT_PIN = "admin123";
         let soundFxEnabled = localStorage.getItem('lru_sound_fx') !== 'false';
@@ -1175,7 +1180,7 @@
 
         function toggleAnonymous(isAnon) {
             const contactFields = document.getElementById('contactFields');
-            const fullnameInput = document.getElementById('fullname');
+            const fullnameInput = document.getElementById('userName');
             const contactInput = document.getElementById('contact');
             if(isAnon) {
                 contactFields.style.opacity = '0.4';
@@ -1332,79 +1337,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function handleFormSubmit(e) {
-            e.preventDefault();
-            
-            const reporterStatus = document.getElementById('reporterStatus').value;
-            const category = document.getElementById('category').value;
-            const priority = document.getElementById('priority').value;
-            const subject = document.getElementById('subject').value.trim();
-            const description = document.getElementById('description').value.trim();
-            const isAnonymous = document.getElementById('isAnonymous').checked;
-            const fullname = document.getElementById('fullname').value.trim();
-            const contact = document.getElementById('contact').value.trim();
-            const fileInput = document.getElementById('attachment');
-
-            if (!reporterStatus) {
-                showToast(currentLang === 'th' ? 'กรุณาเลือกสถานะผู้แจ้งปัญหา' : 'Please select reporter status', 'error');
-                return;
-            }
-            if (!category) {
-                showToast(currentLang === 'th' ? 'กรุณาเลือกหน่วยงาน / คณะ' : 'Please select a department', 'error');
-                return;
-            }
-            if (!subject) {
-                showToast(currentLang === 'th' ? 'กรุณาระบุหัวข้อเรื่อง' : 'Please enter a subject', 'error');
-                return;
-            }
-            if (!description) {
-                showToast(currentLang === 'th' ? 'กรุณาระบุรายละเอียด' : 'Please enter details', 'error');
-                return;
-            }
-
-            const ticketId = '#LRU-' + Math.floor(1000 + Math.random() * 9000);
-            const now = new Date().toLocaleString('th-TH');
-
-            const processData = (imgData = '') => {
-                const newComplaint = {
-                    id: ticketId,
-                    reporterStatus: reporterStatus,
-                    category: category,
-                    priority: priority,
-                    subject: subject,
-                    description: description,
-                    isAnonymous: isAnonymous,
-                    fullname: isAnonymous ? 'ไม่ระบุตัวตน (Anonymous)' : (fullname || 'ไม่ระบุชื่อ'),
-                    contact: isAnonymous ? '-' : (contact || '-'),
-                    attachment: imgData,
-                    status: 'รับเรื่องแล้ว',
-                    adminReply: '',
-                    date: now
-                };
-
-                let list = getComplaints();
-                list.unshift(newComplaint);
-                if (saveComplaints(list)) {
-                    addMyTicketId(ticketId);
-                    playSuccessChime();
-                    
-                    document.getElementById('modalTicketId').innerText = ticketId;
-                    document.getElementById('successModal').classList.remove('hidden');
-                    document.getElementById('successModal').classList.add('flex');
-                }
-            };
-
-            if (fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(uploadEvent) {
-                    processData(uploadEvent.target.result);
-                };
-                reader.readAsDataURL(fileInput.files[0]);
-            } else {
-                processData('');
-            }
-        }
-
         function closeModal() {
             playClickSound();
             document.getElementById('successModal').classList.remove('flex');
@@ -1478,17 +1410,11 @@
                         ` : ''}
 
                         ${item.adminReply ? `
-                            <div class="p-3 bg-pink-50/70 dark:bg-slate-800/80 rounded-xl border border-pink-200 dark:border-slate-700 space-y-1 mt-2">
-                                <p class="text-[11px] font-bold text-pink-600 dark:text-pink-400 flex items-center gap-1">
-                                    <i class="fa-solid fa-reply"></i> ข้อความตอบกลับจากแอดมิน:
-                                </p>
-                                <p class="text-xs text-slate-700 dark:text-slate-300">${item.adminReply}</p>
+                            <div class="p-3 bg-sky-50/80 dark:bg-slate-900/80 rounded-xl border border-sky-200 dark:border-slate-700 text-xs space-y-1">
+                                <p class="font-bold text-sky-700 dark:text-sky-400 flex items-center gap-1.5"><i class="fa-solid fa-circle-check"></i> ข้อความตอบกลับจากแอดมิน:</p>
+                                <p class="text-slate-600 dark:text-slate-300">${item.adminReply}</p>
                             </div>
                         ` : ''}
-
-                        <div class="text-[10px] text-slate-400 text-right pt-1">
-                            <i class="fa-regular fa-clock mr-1"></i> ${item.date}
-                        </div>
                     </div>
                 `;
             }).join('');
@@ -1496,118 +1422,182 @@
 
         function openImageModal(imgSrc) {
             playClickSound();
-            document.getElementById('modalImagePreview').src = imgSrc;
             const modal = document.getElementById('imageModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            const preview = document.getElementById('modalImagePreview');
+            if(modal && preview) {
+                preview.src = imgSrc;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
         }
 
         function closeImageModal() {
             playClickSound();
             const modal = document.getElementById('imageModal');
-            modal.classList.remove('flex');
-            modal.classList.add('hidden');
+            if(modal) {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }
         }
 
-        function renderAdminDashboard() {
-            const tableBody = document.getElementById('adminTableBody');
-            if(!tableBody) return;
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            playClickSound();
 
-            const list = getComplaints();
-            const searchTerm = (document.getElementById('adminSearchInput').value || '').toLowerCase();
-            const statusFilter = document.getElementById('adminStatusFilter').value;
+            const userStatus = document.getElementById('userStatus').value;
+            const department = document.getElementById('department').value;
+            const urgency = document.getElementById('complaintUrgency').value;
+            const subject = document.getElementById('complaintTitle').value.trim();
+            const description = document.getElementById('complaintDetail').value.trim();
+            const isAnonymous = document.getElementById('isAnonymous').checked;
+            const userName = document.getElementById('userName').value.trim();
+            const contact = document.getElementById('contact').value.trim();
+            const fileInput = document.getElementById('attachment');
 
-            const filtered = list.filter(item => {
-                const matchSearch = item.id.toLowerCase().includes(searchTerm) || 
-                                    item.subject.toLowerCase().includes(searchTerm) || 
-                                    item.fullname.toLowerCase().includes(searchTerm) ||
-                                    item.category.toLowerCase().includes(searchTerm);
-                const matchStatus = (statusFilter === 'ALL' || item.status === statusFilter);
-                return matchSearch && matchStatus;
-            });
-
-            // Update stats
-            const total = list.length;
-            const pending = list.filter(i => i.status === 'รับเรื่องแล้ว' || i.status === 'กำลังดำเนินการ').length;
-            const resolved = list.filter(i => i.status === 'แก้ไขเรียบร้อย').length;
-
-            document.getElementById('stat-total').innerText = total;
-            document.getElementById('stat-pending').innerText = pending;
-            document.getElementById('stat-resolved').innerText = resolved;
-
-            // Update Graph Proportion
-            const countReceived = list.filter(i => i.status === 'รับเรื่องแล้ว').length;
-            const countInProgress = list.filter(i => i.status === 'กำลังดำเนินการ').length;
-            const countCompleted = list.filter(i => i.status === 'แก้ไขเรียบร้อย').length;
-
-            const pReceived = total > 0 ? Math.round((countReceived / total) * 100) : 0;
-            const pPending = total > 0 ? Math.round((countInProgress / total) * 100) : 0;
-            const pResolved = total > 0 ? Math.round((countCompleted / total) * 100) : 0;
-
-            document.getElementById('graph-percent-received').innerText = `${pReceived}%`;
-            document.getElementById('graph-bar-received').style.width = `${pReceived}%`;
-
-            document.getElementById('graph-percent-pending').innerText = `${pPending}%`;
-            document.getElementById('graph-bar-pending').style.width = `${pPending}%`;
-
-            document.getElementById('graph-percent-resolved').innerText = `${pResolved}%`;
-            document.getElementById('graph-bar-resolved').style.width = `${pResolved}%`;
-
-            if(filtered.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="8" class="p-8 text-center text-slate-400 text-xs">
-                            ไม่พบรายการเรื่องร้องเรียน
-                        </td>
-                    </tr>
-                `;
+            if (!userStatus || !department || !subject || !description) {
+                showToast(currentLang === 'th' ? 'กรุณากรอกข้อมูลในช่องที่มีเครื่องหมาย * ให้ครบถ้วน' : 'Please fill out all required fields marked with *', 'error');
                 return;
             }
 
-            tableBody.innerHTML = filtered.map(item => {
-                let badgeClass = 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300';
-                if(item.status === 'กำลังดำเนินการ') badgeClass = 'bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300';
-                if(item.status === 'แก้ไขเรียบร้อย') badgeClass = 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300';
+            const ticketId = '#LRU-' + Math.floor(1000 + Math.random() * 9000);
 
-                let priorityColor = 'text-emerald-600';
-                if(item.priority === 'ด่วน') priorityColor = 'text-amber-500';
-                if(item.priority === 'ด่วนที่สุด') priorityColor = 'text-rose-600 font-bold';
+            let attachmentData = '';
+            const processSave = (imgBase64 = '') => {
+                const newComplaint = {
+                    id: ticketId,
+                    reporterStatus: userStatus,
+                    category: department,
+                    urgency: urgency,
+                    subject: subject,
+                    description: description,
+                    isAnonymous: isAnonymous,
+                    userName: isAnonymous ? 'ไม่ระบุตัวตน (Anonymous)' : (userName || 'ไม่ระบุชื่อ'),
+                    contact: isAnonymous ? '-' : (contact || '-'),
+                    attachment: imgBase64,
+                    status: 'รับเรื่องแล้ว',
+                    adminReply: '',
+                    createdAt: new Date().toISOString()
+                };
+
+                let complaints = getComplaints();
+                complaints.unshift(newComplaint);
+                if (saveComplaints(complaints)) {
+                    addMyTicketId(ticketId);
+                    playSuccessChime();
+                    document.getElementById('modalTicketId').innerText = ticketId;
+                    const successModal = document.getElementById('successModal');
+                    if(successModal) {
+                        successModal.classList.remove('hidden');
+                        successModal.classList.add('flex');
+                    }
+                }
+            };
+
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(uploadEvent) {
+                    processSave(uploadEvent.target.result);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                processSave('');
+            }
+        }
+
+        function renderAdminDashboard() {
+            const complaints = getComplaints();
+            const searchVal = (document.getElementById('adminSearchInput')?.value || '').toLowerCase();
+            const statusFilter = document.getElementById('adminStatusFilter')?.value || 'ALL';
+
+            const total = complaints.length;
+            const pending = complaints.filter(c => c.status === 'รับเรื่องแล้ว' || c.status === 'กำลังดำเนินการ').length;
+            const resolved = complaints.filter(c => c.status === 'แก้ไขเรียบร้อย').length;
+
+            if(document.getElementById('stat-total')) document.getElementById('stat-total').innerText = total;
+            if(document.getElementById('stat-pending')) document.getElementById('stat-pending').innerText = pending;
+            if(document.getElementById('stat-resolved')) document.getElementById('stat-resolved').innerText = resolved;
+
+            const receivedCount = complaints.filter(c => c.status === 'รับเรื่องแล้ว').length;
+            const inProgCount = complaints.filter(c => c.status === 'กำลังดำเนินการ').length;
+            const resolvedCount = resolved;
+
+            const calcPercent = (count) => total > 0 ? Math.round((count / total) * 100) : 0;
+            
+            if(document.getElementById('graph-percent-received')) {
+                document.getElementById('graph-percent-received').innerText = calcPercent(receivedCount) + '%';
+                document.getElementById('graph-bar-received').style.width = calcPercent(receivedCount) + '%';
+            }
+            if(document.getElementById('graph-percent-pending')) {
+                document.getElementById('graph-percent-pending').innerText = calcPercent(inProgCount) + '%';
+                document.getElementById('graph-bar-pending').style.width = calcPercent(inProgCount) + '%';
+            }
+            if(document.getElementById('graph-percent-resolved')) {
+                document.getElementById('graph-percent-resolved').innerText = calcPercent(resolvedCount) + '%';
+                document.getElementById('graph-bar-resolved').style.width = calcPercent(resolvedCount) + '%';
+            }
+
+            const filtered = complaints.filter(item => {
+                const matchesSearch = item.id.toLowerCase().includes(searchVal) ||
+                                      item.subject.toLowerCase().includes(searchVal) ||
+                                      item.userName.toLowerCase().includes(searchVal) ||
+                                      item.category.toLowerCase().includes(searchVal);
+                const matchesStatus = statusFilter === 'ALL' || item.status === statusFilter;
+                return matchesSearch && matchesStatus;
+            });
+
+            const tbody = document.getElementById('adminTableBody');
+            if(!tbody) return;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-slate-400 font-medium text-xs">ไม่พบรายการเรื่องร้องเรียนที่ค้นหา</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(item => {
+                let badgeColor = 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300';
+                if (item.status === 'กำลังดำเนินการ') badgeColor = 'bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300';
+                if (item.status === 'แก้ไขเรียบร้อย') badgeColor = 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300';
+
+                let priorityBadge = 'text-emerald-600 bg-emerald-50 dark:bg-slate-800';
+                if (item.urgency === 'ด่วน') priorityBadge = 'text-amber-600 bg-amber-50 dark:bg-slate-800';
+                if (item.urgency === 'ด่วนที่สุด') priorityBadge = 'text-rose-600 bg-rose-50 dark:bg-slate-800';
 
                 return `
-                    <tr class="hover:bg-pink-50/50 dark:hover:bg-slate-800/50 transition-colors">
-                        <td class="p-3.5 sm:p-4 font-mono font-bold text-pink-600 dark:text-pink-400 text-xs whitespace-nowrap">${item.id}</td>
+                    <tr class="hover:bg-pink-50/40 dark:hover:bg-slate-800/40 transition-colors">
+                        <td class="p-3.5 sm:p-4 font-mono font-bold text-pink-600 dark:text-pink-400 whitespace-nowrap">${item.id}</td>
                         <td class="p-3.5 sm:p-4 max-w-xs">
-                            <p class="font-bold text-slate-900 dark:text-white text-xs sm:text-sm line-clamp-1">${item.subject}</p>
-                            <p class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1"><i class="fa-solid fa-building mr-1"></i> ${item.category}</p>
+                            <p class="font-bold text-slate-900 dark:text-white truncate">${item.subject}</p>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate"><i class="fa-solid fa-building mr-1"></i> ${item.category} (${item.reporterStatus})</p>
                         </td>
                         <td class="p-3.5 sm:p-4 whitespace-nowrap">
                             ${item.attachment ? `
-                                <button onclick="openImageModal('${item.attachment}')" class="px-2.5 py-1 bg-pink-50 dark:bg-slate-800 text-pink-600 dark:text-pink-400 rounded-lg text-[11px] font-semibold border border-pink-200 dark:border-slate-700 hover:bg-pink-100 transition-all flex items-center gap-1 shadow-sm">
-                                    <i class="fa-solid fa-image"></i> ดูรูป
+                                <button onclick="openImageModal('${item.attachment}')" class="px-2.5 py-1 bg-pink-50 dark:bg-slate-800 text-pink-600 dark:text-pink-400 rounded-lg text-xs font-semibold hover:bg-pink-100 transition-all border border-pink-200 dark:border-slate-700 shadow-sm">
+                                    <i class="fa-solid fa-image"></i> รูปภาพ
                                 </button>
-                            ` : `<span class="text-slate-400 text-[11px]">ไม่มีรูป</span>`}
+                            ` : '<span class="text-slate-400 text-xs">ไม่มีหลักฐาน</span>'}
                         </td>
                         <td class="p-3.5 sm:p-4 text-xs">
-                            <p class="font-bold text-slate-800 dark:text-slate-200 truncate max-w-[140px]">${item.fullname}</p>
-                            <p class="text-[11px] text-slate-400 truncate max-w-[140px]">${item.contact}</p>
-                            <span class="inline-block mt-0.5 px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] text-slate-600 dark:text-slate-300">${item.reporterStatus}</span>
+                            <p class="font-bold text-slate-800 dark:text-slate-200 truncate">${item.userName}</p>
+                            <p class="text-[11px] text-slate-400 truncate">${item.contact}</p>
                         </td>
-                        <td class="p-3.5 sm:p-4 text-xs whitespace-nowrap ${priorityColor}">${item.priority}</td>
                         <td class="p-3.5 sm:p-4 whitespace-nowrap">
-                            <select onchange="updateTicketStatus('${item.id}', this.value)" class="px-2.5 py-1.5 rounded-xl text-[11px] font-bold ${badgeClass} border border-pink-200/50 dark:border-slate-700 cursor-pointer focus:outline-none shadow-sm">
+                            <span class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold ${priorityBadge}">${item.urgency}</span>
+                        </td>
+                        <td class="p-3.5 sm:p-4 whitespace-nowrap">
+                            <select onchange="updateTicketStatus('${item.id}', this.value)" class="px-2.5 py-1.5 rounded-xl text-xs font-bold border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-white cursor-pointer shadow-sm ${badgeColor}">
                                 <option value="รับเรื่องแล้ว" ${item.status === 'รับเรื่องแล้ว' ? 'selected' : ''}>🟠 รับเรื่องแล้ว</option>
                                 <option value="กำลังดำเนินการ" ${item.status === 'กำลังดำเนินการ' ? 'selected' : ''}>🔵 กำลังดำเนินการ</option>
                                 <option value="แก้ไขเรียบร้อย" ${item.status === 'แก้ไขเรียบร้อย' ? 'selected' : ''}>🟢 แก้ไขเรียบร้อย</option>
                             </select>
                         </td>
                         <td class="p-3.5 sm:p-4 text-center whitespace-nowrap">
-                            <button onclick="openReplyModal('${item.id}')" class="px-3 py-1.5 bg-sky-50 dark:bg-slate-800 text-sky-600 dark:text-sky-400 hover:bg-sky-100 rounded-xl text-xs font-semibold transition-all border border-sky-200 dark:border-slate-700 shadow-sm inline-flex items-center gap-1 transform active:scale-95">
-                                <i class="fa-solid fa-comment-dots"></i> ตอบ
+                            <button onclick="openReplyModal('${item.id}')" class="px-3 py-1.5 bg-sky-50 dark:bg-slate-800 text-sky-600 dark:text-sky-400 hover:bg-sky-100 rounded-xl text-xs font-bold transition-all border border-sky-200 dark:border-slate-700 shadow-sm">
+                                <i class="fa-solid fa-comment-dots"></i> ตอบกลับ
                             </button>
                         </td>
                         <td class="p-3.5 sm:p-4 text-center whitespace-nowrap">
-                            <button onclick="deleteTicket('${item.id}')" class="w-8 h-8 rounded-xl bg-rose-50 dark:bg-slate-800 text-rose-500 hover:bg-rose-100 hover:text-rose-600 flex items-center justify-center transition-all border border-rose-200 dark:border-slate-700 shadow-sm mx-auto transform active:scale-95">
-                                <i class="fa-solid fa-trash-can text-xs"></i>
+                            <button onclick="deleteTicket('${item.id}')" class="p-2 bg-rose-50 dark:bg-slate-800 text-rose-600 dark:text-rose-400 hover:bg-rose-100 rounded-xl text-xs font-bold transition-all border border-rose-200 dark:border-slate-700 shadow-sm">
+                                <i class="fa-solid fa-trash-can"></i>
                             </button>
                         </td>
                     </tr>
@@ -1615,66 +1605,76 @@
             }).join('');
         }
 
-        function updateTicketStatus(id, newStatus) {
+        function updateTicketStatus(ticketId, newStatus) {
             playClickSound();
-            let list = getComplaints();
-            const index = list.findIndex(i => i.id === id);
-            if(index !== -1) {
-                list[index].status = newStatus;
-                saveComplaints(list);
-                renderAdminDashboard();
-                showToast(currentLang === 'th' ? `อัปเดตสถานะ ${id} เรียบร้อย` : `Updated status for ${id}`, 'success');
+            let complaints = getComplaints();
+            const idx = complaints.findIndex(c => c.id === ticketId);
+            if (idx !== -1) {
+                complaints[idx].status = newStatus;
+                if (saveComplaints(complaints)) {
+                    renderAdminDashboard();
+                    showToast(currentLang === 'th' ? `อัปเดตสถานะ ${ticketId} เป็น "${newStatus}" เรียบร้อย` : `Updated status for ${ticketId}`, 'success');
+                }
             }
         }
 
-        function openReplyModal(id) {
+        function openReplyModal(ticketId) {
             playClickSound();
-            const list = getComplaints();
-            const item = list.find(i => i.id === id);
-            if(!item) return;
+            const complaints = getComplaints();
+            const item = complaints.find(c => c.id === ticketId);
+            if (!item) return;
 
-            document.getElementById('currentReplyId').value = id;
-            document.getElementById('replyTicketTitle').innerText = `${item.subject}`;
-            document.getElementById('replyTicketSub').innerText = `รหัส: ${item.id} | หน่วยงาน: ${item.category}`;
+            document.getElementById('currentReplyId').value = ticketId;
+            document.getElementById('replyTicketTitle').innerText = `${translations[currentLang].modal_reply_title}: ${item.subject}`;
+            document.getElementById('replyTicketSub').innerText = `รหัส: ${item.id} | ผู้แจ้ง: ${item.userName}`;
             document.getElementById('replyTicketDesc').innerText = item.description;
             document.getElementById('adminReplyText').value = item.adminReply || '';
 
             const modal = document.getElementById('replyModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            if(modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
         }
 
         function closeReplyModal() {
             playClickSound();
             const modal = document.getElementById('replyModal');
-            modal.classList.remove('flex');
-            modal.classList.add('hidden');
+            if(modal) {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }
         }
 
         function submitAdminReply() {
             playClickSound();
-            const id = document.getElementById('currentReplyId').value;
+            const ticketId = document.getElementById('currentReplyId').value;
             const replyText = document.getElementById('adminReplyText').value.trim();
 
-            let list = getComplaints();
-            const index = list.findIndex(i => i.id === id);
-            if(index !== -1) {
-                list[index].adminReply = replyText;
-                saveComplaints(list);
-                closeReplyModal();
-                renderAdminDashboard();
-                showToast(currentLang === 'th' ? 'บันทึกข้อความตอบกลับเรียบร้อย' : 'Reply saved successfully', 'success');
+            let complaints = getComplaints();
+            const idx = complaints.findIndex(c => c.id === ticketId);
+            if (idx !== -1) {
+                complaints[idx].adminReply = replyText;
+                if (replyText && complaints[idx].status === 'รับเรื่องแล้ว') {
+                    complaints[idx].status = 'กำลังดำเนินการ';
+                }
+                if (saveComplaints(complaints)) {
+                    closeReplyModal();
+                    renderAdminDashboard();
+                    showToast(currentLang === 'th' ? 'บันทึกข้อความตอบกลับเรียบร้อยแล้ว' : 'Reply sent successfully', 'success');
+                }
             }
         }
 
-        function deleteTicket(id) {
+        function deleteTicket(ticketId) {
             playClickSound();
-            if(confirm(currentLang === 'th' ? `คุณต้องการลบเรื่องร้องเรียนรหัส ${id} ใช่หรือไม่?` : `Are you sure you want to delete ticket ${id}?`)) {
-                let list = getComplaints();
-                list = list.filter(i => i.id !== id);
-                saveComplaints(list);
-                renderAdminDashboard();
-                showToast(currentLang === 'th' ? 'ลบรายการเรียบร้อยแล้ว' : 'Ticket deleted successfully', 'info');
+            if (confirm(currentLang === 'th' ? `คุณต้องการลบเรื่องร้องเรียนรหัส ${ticketId} ใช่หรือไม่?` : `Are you sure you want to delete ${ticketId}?`)) {
+                let complaints = getComplaints();
+                complaints = complaints.filter(c => c.id !== ticketId);
+                if (saveComplaints(complaints)) {
+                    renderAdminDashboard();
+                    showToast(currentLang === 'th' ? 'ลบรายการเรียบร้อยแล้ว' : 'Item deleted', 'info');
+                }
             }
         }
 
@@ -1682,72 +1682,72 @@
             playClickSound();
             const mockItems = [
                 {
-                    id: '#LRU-9421',
+                    id: '#LRU-9921',
                     reporterStatus: 'นักศึกษา',
                     category: 'สำนักวิทยบริการและเทคโนโลยีสารสนเทศ',
-                    priority: 'ด่วน',
-                    subject: 'Wi-Fi ในหอสมุดเชื่อมต่อหลุดบ่อยมาก',
-                    description: 'ไม่สามารถใช้งานอินเทอร์เน็ตเพื่อค้นคว้างานวิจัยได้เนื่องจากสัญญาณหลุดทุกๆ 5 นาที',
+                    urgency: 'ด่วน',
+                    subject: 'Wi-Fi ในหอพักนักศึกษาหลุดบ่อยมากในช่วงค่ำ',
+                    description: 'เชื่อมต่อแล้วสัญญาณหลุดทุกๆ 10 นาที ทำให้ไม่สามารถส่งงานอาจารย์ทันกำหนดได้',
                     isAnonymous: false,
-                    fullname: 'นายสมชาย เรียนดี (65410123)',
-                    contact: 'somchai@lru.ac.th',
-                    attachment: '',
-                    status: 'กำลังดำเนินการ',
-                    adminReply: 'เจ้าหน้าที่ฝ่ายเทคโนโลยีสารสนเทศรับเรื่องแล้ว กำลังตรวจสอบ Access Point ชั้น 2',
-                    date: new Date().toLocaleString('th-TH')
-                },
-                {
-                    id: '#LRU-8102',
-                    reporterStatus: 'อาจารย์ / บุคลากร',
-                    category: 'อาคารสถานที่และสิ่งแวดล้อม',
-                    priority: 'ด่วนที่สุด',
-                    subject: 'แอร์ในห้องบรรยาย 302 อาคารเรียนรวมเสีย',
-                    description: 'อากาศร้อนอบอ้าวมาก นักศึกษาเรียนไม่รู้เรื่องและไม่มีสมาธิ',
-                    isAnonymous: false,
-                    fullname: 'ผศ.ดร.วิชาญ บริหาร',
-                    contact: '042-835224',
+                    userName: 'นายสมชาย ใจดี (65412301)',
+                    contact: '0891234567',
                     attachment: '',
                     status: 'รับเรื่องแล้ว',
                     adminReply: '',
-                    date: new Date().toLocaleString('th-TH')
+                    createdAt: new Date().toISOString()
                 },
                 {
-                    id: '#LRU-5514',
+                    id: '#LRU-8842',
+                    reporterStatus: 'อาจารย์ / บุคลากร',
+                    category: 'คณะเทคโนโลยี',
+                    urgency: 'ด่วนที่สุด',
+                    subject: 'โปรเจคเตอร์ห้อง Lab คอมพิวเตอร์ 3 ภาพไม่ติด',
+                    description: 'เวลาเปิดใช้งานหลอดภาพกระพริบแล้วตัดดับ มีกลิ่นไหม้จางๆ บริเวณเครื่องฉาย',
+                    isAnonymous: false,
+                    userName: 'ดร.วิชัย รักเรียน',
+                    contact: 'vichai@lru.ac.th',
+                    attachment: '',
+                    status: 'กำลังดำเนินการ',
+                    adminReply: 'ได้รับเรื่องแล้ว กำลังให้เจ้าหน้าที่เข้าตรวจสอบหน้างาน',
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: '#LRU-7719',
                     reporterStatus: 'นักศึกษา',
-                    category: 'สำนักส่งเสริมวิชาการและงานทะเบียน',
-                    priority: 'ปกติ',
-                    subject: 'สอบถามกำหนดการเพิ่ม-ถอนรายวิชาภาคเรียนนี้',
-                    description: 'ต้องการทราบกำหนดการที่แน่นอนเพื่อไม่ให้พ้นสภาพหรือลงทะเบียนล่าช้า',
+                    category: 'กองพัฒนานักศึกษา',
+                    urgency: 'ปกติ',
+                    subject: 'ขอเพิ่มไฟส่องสว่างบริเวณทางเดินโรงอาหาร',
+                    description: 'ช่วงเวลากลางคืนทางเดินมืดเกินไป อาจเป็นอันตรายต่อนักศึกษาที่เดินกลับหอพักดึก',
                     isAnonymous: true,
-                    fullname: 'ไม่ระบุตัวตน (Anonymous)',
+                    userName: 'ไม่ระบุตัวตน (Anonymous)',
                     contact: '-',
                     attachment: '',
                     status: 'แก้ไขเรียบร้อย',
-                    adminReply: 'ได้ประกาศกำหนดการลงทะเบียนผ่านหน้าเว็บไซต์สำนักทะเบียนแล้วครับ',
-                    date: new Date().toLocaleString('th-TH')
+                    adminReply: 'ดำเนินการเปลี่ยนหลอดไฟส่องสว่าง LED ใหม่เรียบร้อยแล้วครับ',
+                    createdAt: new Date().toISOString()
                 }
             ];
 
-            let list = getComplaints();
-            // รวม mock เข้าไปโดยไม่ให้ซ้ำ
-            mockItems.forEach(m => {
-                if(!list.some(existing => existing.id === m.id)) {
-                    list.unshift(m);
-                    addMyTicketId(m.id);
+            let complaints = getComplaints();
+            mockItems.forEach(mock => {
+                if (!complaints.some(c => c.id === mock.id)) {
+                    complaints.unshift(mock);
+                    addMyTicketId(mock.id);
                 }
             });
 
-            saveComplaints(list);
-            renderAdminDashboard();
-            showToast(currentLang === 'th' ? 'สร้างข้อมูลตัวอย่างสำเร็จ' : 'Mock data generated successfully', 'success');
+            if (saveComplaints(complaints)) {
+                renderAdminDashboard();
+                showToast(currentLang === 'th' ? 'สร้างข้อมูลตัวอย่างสำเร็จ' : 'Mock data generated', 'success');
+            }
         }
 
         function clearAllData() {
             playClickSound();
-            if(confirm(currentLang === 'th' ? 'คุณต้องการล้างข้อมูลเรื่องร้องเรียนทั้งหมดในระบบใช่หรือไม่?' : 'Are you sure you want to clear all system complaints?')) {
+            if (confirm(currentLang === 'th' ? 'คุณต้องการล้างข้อมูลเรื่องร้องเรียนทั้งหมดในระบบใช่หรือไม่?' : 'Are you sure you want to clear all complaints?')) {
                 localStorage.removeItem(STORAGE_KEY);
                 renderAdminDashboard();
-                showToast(currentLang === 'th' ? 'ล้างข้อมูลทั้งหมดในระบบเรียบร้อย' : 'All system data cleared', 'info');
+                showToast(currentLang === 'th' ? 'ล้างข้อมูลทั้งหมดในระบบเรียบร้อย' : 'All data cleared', 'info');
             }
         }
     </script>
