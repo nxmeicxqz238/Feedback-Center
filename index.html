@@ -160,7 +160,7 @@
         <section id="sec-submit" class="space-y-6 animate-fade-in max-w-2xl mx-auto">
             <div class="text-center max-w-lg mx-auto mb-6 sm:mb-8 space-y-2">
                 <span class="inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-pink-600 dark:text-pink-400 bg-pink-50/90 dark:bg-slate-800 px-3.5 py-1.5 rounded-full border border-pink-200/80 dark:border-slate-700 shadow-sm animate-float">
-                    <i class="fa-solid fa-bolt text-pink-500 animate-pulse"></i>Loei Rajabhat Support
+                    <i class="fa-solid fa-bolt text-pink-500 animate-pulse"></i>Loei Rajabhat University Support
                 </span>
                 <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight" data-i18n="form_heading">ส่งเรื่องร้องเรียน / ข้อเสนอแนะ</h2>
                 <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm" data-i18n="form_subheading">ระบบกลางรับเรื่องร้องเรียนภายในมหาวิทยาลัย รวดเร็ว ปลอดภัย ตรวจสอบสถานะในประวัติของฉันได้ทันที</p>
@@ -315,11 +315,11 @@
                     <form onsubmit="handleAdminLogin(event)" class="space-y-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5" data-i18n="label_username">ชื่อผู้ใช้ (Username)</label>
-                            <input type="text" id="adminUser" required data-i18n-placeholder="placeholder_username" placeholder="ระบุชื่อผู้ใช้" class="w-full px-4.5 py-3.5 rounded-2xl border border-pink-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm" value="admin">
+                            <input type="text" id="adminUser" required data-i18n-placeholder="placeholder_username" placeholder="ระบุชื่อผู้ใช้" class="w-full px-4.5 py-3.5 rounded-2xl border border-pink-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm" value="">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5" data-i18n="label_password">รหัสผ่าน (Password)</label>
-                            <input type="password" id="adminPass" required data-i18n-placeholder="placeholder_password" placeholder="ระบุรหัสผ่าน" class="w-full px-4.5 py-3.5 rounded-2xl border border-pink-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm" value="admin123">
+                            <input type="password" id="adminPass" required data-i18n-placeholder="placeholder_password" placeholder="ระบุรหัสผ่าน" class="w-full px-4.5 py-3.5 rounded-2xl border border-pink-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm" value="">
                         </div>
                         
                         <p id="adminAuthError" class="text-xs text-rose-500 hidden font-medium text-center bg-rose-50 dark:bg-slate-800 py-2.5 rounded-xl border border-rose-200 leading-relaxed"></p>
@@ -706,7 +706,6 @@
 
     <!-- JavaScript Application Logic -->
     <script>
-        // --- พจนานุกรมแปลภาษา (i18n Dictionary) ---
         const translations = {
             th: {
                 app_title: "ระบบแจ้งเรื่องร้องเรียนระดับองค์กร | มหาวิทยาลัยราชภัฏเลย",
@@ -920,6 +919,8 @@
 
         const STORAGE_KEY = 'lru_complaints_pinkblue_v3';
         const MY_TICKETS_KEY = 'user_my_tickets_v3';
+        
+        // ปรับแก้ให้ใช้ sessionStorage เพื่อให้ระบบต้องล็อกอินใหม่ทุกครั้งที่เปิดเข้าเว็บใหม่หรือปิดแท็บ
         let isAdminLoggedIn = sessionStorage.getItem('isAdminLoggedIn') === 'true';
 
         let failedAttempts = 0;
@@ -1438,52 +1439,55 @@
 
             if (myData.length === 0) {
                 container.innerHTML = `
-                    <div class="glass-card rounded-3xl p-8 text-center space-y-3">
-                        <div class="w-16 h-16 bg-pink-50 dark:bg-slate-800 text-pink-400 rounded-2xl flex items-center justify-center text-2xl mx-auto shadow-sm">
-                            <i class="fa-solid fa-folder-open"></i>
+                    <div class="glass-card rounded-3xl p-8 text-center space-y-3 shadow-sm">
+                        <div class="w-12 h-12 rounded-2xl bg-pink-50 dark:bg-slate-800 text-pink-400 flex items-center justify-center text-xl mx-auto">
+                            <i class="fa-solid fa-inbox"></i>
                         </div>
-                        <h3 class="font-bold text-slate-800 dark:text-white text-base">${currentLang === 'th' ? 'ยังไม่มีประวัติเรื่องร้องเรียนในเครื่องนี้' : 'No complaint history found'}</h3>
-                        <p class="text-xs text-slate-400">${currentLang === 'th' ? 'เมื่อคุณส่งเรื่องร้องเรียน รหัสติดตามจะบันทึกอัตโนมัติที่นี่' : 'Your submitted tickets will appear here automatically.'}</p>
+                        <p class="text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300">ยังไม่มีประวัติเรื่องร้องเรียนในอุปกรณ์นี้</p>
+                        <button onclick="switchTab('submit')" class="px-4 py-2 bg-pink-500 text-white rounded-xl text-xs font-bold hover:bg-pink-600 transition-all shadow-sm">
+                            แจ้งเรื่องร้องเรียนตอนนี้
+                        </button>
                     </div>
                 `;
                 return;
             }
 
             container.innerHTML = myData.map(item => {
-                let badgeClass = 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300';
-                if(item.status === 'กำลังดำเนินการ') badgeClass = 'bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300';
-                if(item.status === 'แก้ไขเรียบร้อย') badgeClass = 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300';
+                let badgeColor = 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300';
+                if (item.status === 'กำลังดำเนินการ') badgeColor = 'bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300';
+                if (item.status === 'แก้ไขเรียบร้อย') badgeColor = 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300';
 
                 return `
-                    <div class="glass-card rounded-3xl p-5 space-y-3.5 shadow-md">
-                        <div class="flex items-center justify-between gap-2 border-b border-pink-100/60 dark:border-slate-800 pb-3">
-                            <div class="flex items-center gap-2">
-                                <span class="font-mono font-extrabold text-pink-600 dark:text-pink-400 text-xs sm:text-sm bg-pink-50 dark:bg-slate-800 px-3 py-1 rounded-xl border border-pink-200 dark:border-slate-700">${item.id}</span>
-                                <span class="text-[11px] px-2.5 py-0.5 rounded-full font-semibold ${badgeClass}">${item.status}</span>
-                            </div>
-                            <span class="text-[11px] text-slate-400 font-medium"><i class="fa-regular fa-clock mr-1"></i>${item.date}</span>
+                    <div class="glass-card rounded-2xl p-4 sm:p-5 space-y-3 shadow-md">
+                        <div class="flex items-center justify-between gap-2 border-b border-pink-100 dark:border-slate-800 pb-3">
+                            <span class="font-mono text-xs font-bold text-pink-600 dark:text-pink-400">${item.id}</span>
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold ${badgeColor}">${item.status}</span>
                         </div>
                         <div class="space-y-1">
-                            <div class="flex items-center gap-2">
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-50 dark:bg-slate-800 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-slate-700">${item.reporterStatus || 'นักศึกษา'}</span>
-                                <span class="text-xs font-bold text-slate-500">${item.category}</span>
-                            </div>
-                            <h4 class="font-bold text-slate-900 dark:text-white text-sm sm:text-base">${item.subject}</h4>
-                            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed bg-white/60 dark:bg-slate-900/40 p-3 rounded-2xl border border-pink-100/40 dark:border-slate-800">${item.description}</p>
+                            <h4 class="font-bold text-xs sm:text-sm text-slate-900 dark:text-white">${item.subject}</h4>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400"><i class="fa-solid fa-building mr-1"></i> ${item.category} (${item.reporterStatus})</p>
+                            <p class="text-xs text-slate-600 dark:text-slate-300 mt-2 bg-slate-50 dark:bg-slate-900/60 p-3 rounded-xl border border-slate-100 dark:border-slate-800 leading-relaxed">${item.description}</p>
                         </div>
-                        ${item.adminReply ? `
-                            <div class="p-3.5 rounded-2xl bg-sky-50 dark:bg-slate-800/80 border border-sky-200 dark:border-slate-700 space-y-1">
-                                <p class="text-[11px] font-bold text-sky-700 dark:text-sky-300 flex items-center gap-1.5"><i class="fa-solid fa-reply"></i> ${currentLang === 'th' ? 'ข้อความตอบกลับจากแอดมิน:' : 'Admin Reply:'}</p>
-                                <p class="text-xs text-slate-700 dark:text-slate-200 leading-relaxed">${item.adminReply}</p>
+                        
+                        ${item.attachment ? `
+                            <div class="pt-1">
+                                <button onclick="openImageModal('${item.attachment}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-pink-50 dark:bg-slate-800 text-pink-600 dark:text-pink-400 hover:bg-pink-100 rounded-xl text-xs font-semibold transition-all border border-pink-200 dark:border-slate-700 shadow-sm">
+                                    <i class="fa-solid fa-image"></i> ดูรูปภาพหลักฐาน
+                                </button>
                             </div>
                         ` : ''}
-                        <div class="flex items-center justify-between pt-1 text-xs text-slate-500">
-                            <span><i class="fa-solid fa-user-shield mr-1"></i> ${item.fullname}</span>
-                            ${item.attachment ? `
-                                <button onclick="openImageModal('${item.attachment}')" class="px-3 py-1.5 bg-pink-50 hover:bg-pink-100 dark:bg-slate-800 text-pink-600 dark:text-pink-400 rounded-xl font-semibold transition-all flex items-center gap-1.5 border border-pink-200 dark:border-slate-700 shadow-sm">
-                                    <i class="fa-solid fa-image"></i> ${currentLang === 'th' ? 'ดูหลักฐาน' : 'View Evidence'}
-                                </button>
-                            ` : `<span class="text-slate-400 text-[11px]">${currentLang === 'th' ? 'ไม่มีรูปภาพหลักฐาน' : 'No attachment'}</span>`}
+
+                        ${item.adminReply ? `
+                            <div class="p-3 bg-pink-50/70 dark:bg-slate-800/80 rounded-xl border border-pink-200 dark:border-slate-700 space-y-1 mt-2">
+                                <p class="text-[11px] font-bold text-pink-600 dark:text-pink-400 flex items-center gap-1">
+                                    <i class="fa-solid fa-reply"></i> ข้อความตอบกลับจากแอดมิน:
+                                </p>
+                                <p class="text-xs text-slate-700 dark:text-slate-300">${item.adminReply}</p>
+                            </div>
+                        ` : ''}
+
+                        <div class="text-[10px] text-slate-400 text-right pt-1">
+                            <i class="fa-regular fa-clock mr-1"></i> ${item.date}
                         </div>
                     </div>
                 `;
@@ -1506,10 +1510,23 @@
         }
 
         function renderAdminDashboard() {
+            const tableBody = document.getElementById('adminTableBody');
+            if(!tableBody) return;
+
             const list = getComplaints();
-            const searchVal = document.getElementById('adminSearchInput').value.toLowerCase();
+            const searchTerm = (document.getElementById('adminSearchInput').value || '').toLowerCase();
             const statusFilter = document.getElementById('adminStatusFilter').value;
 
+            const filtered = list.filter(item => {
+                const matchSearch = item.id.toLowerCase().includes(searchTerm) || 
+                                    item.subject.toLowerCase().includes(searchTerm) || 
+                                    item.fullname.toLowerCase().includes(searchTerm) ||
+                                    item.category.toLowerCase().includes(searchTerm);
+                const matchStatus = (statusFilter === 'ALL' || item.status === statusFilter);
+                return matchSearch && matchStatus;
+            });
+
+            // Update stats
             const total = list.length;
             const pending = list.filter(i => i.status === 'รับเรื่องแล้ว' || i.status === 'กำลังดำเนินการ').length;
             const resolved = list.filter(i => i.status === 'แก้ไขเรียบร้อย').length;
@@ -1518,90 +1535,78 @@
             document.getElementById('stat-pending').innerText = pending;
             document.getElementById('stat-resolved').innerText = resolved;
 
-            const receivedCount = list.filter(i => i.status === 'รับเรื่องแล้ว').length;
-            const inProgressCount = list.filter(i => i.status === 'กำลังดำเนินการ').length;
-            const resolvedCount = list.filter(i => i.status === 'แก้ไขเรียบร้อย').length;
+            // Update Graph Proportion
+            const countReceived = list.filter(i => i.status === 'รับเรื่องแล้ว').length;
+            const countInProgress = list.filter(i => i.status === 'กำลังดำเนินการ').length;
+            const countCompleted = list.filter(i => i.status === 'แก้ไขเรียบร้อย').length;
 
-            const pRec = total > 0 ? Math.round((receivedCount / total) * 100) : 0;
-            const pPro = total > 0 ? Math.round((inProgressCount / total) * 100) : 0;
-            const pRes = total > 0 ? Math.round((resolvedCount / total) * 100) : 0;
+            const pReceived = total > 0 ? Math.round((countReceived / total) * 100) : 0;
+            const pPending = total > 0 ? Math.round((countInProgress / total) * 100) : 0;
+            const pResolved = total > 0 ? Math.round((countCompleted / total) * 100) : 0;
 
-            document.getElementById('graph-percent-received').innerText = `${pRec}%`;
-            document.getElementById('graph-bar-received').style.width = `${pRec}%`;
+            document.getElementById('graph-percent-received').innerText = `${pReceived}%`;
+            document.getElementById('graph-bar-received').style.width = `${pReceived}%`;
 
-            document.getElementById('graph-percent-pending').innerText = `${pPro}%`;
-            document.getElementById('graph-bar-pending').style.width = `${pPro}%`;
+            document.getElementById('graph-percent-pending').innerText = `${pPending}%`;
+            document.getElementById('graph-bar-pending').style.width = `${pPending}%`;
 
-            document.getElementById('graph-percent-resolved').innerText = `${pRes}%`;
-            document.getElementById('graph-bar-resolved').style.width = `${pRes}%`;
+            document.getElementById('graph-percent-resolved').innerText = `${pResolved}%`;
+            document.getElementById('graph-bar-resolved').style.width = `${pResolved}%`;
 
-            const filtered = list.filter(item => {
-                const matchSearch = item.id.toLowerCase().includes(searchVal) ||
-                                    item.subject.toLowerCase().includes(searchVal) ||
-                                    item.fullname.toLowerCase().includes(searchVal) ||
-                                    item.category.toLowerCase().includes(searchVal);
-                const matchStatus = statusFilter === 'ALL' || item.status === statusFilter;
-                return matchSearch && matchStatus;
-            });
-
-            const tbody = document.getElementById('adminTableBody');
-            if(!tbody) return;
-
-            if (filtered.length === 0) {
-                tbody.innerHTML = `
+            if(filtered.length === 0) {
+                tableBody.innerHTML = `
                     <tr>
-                        <td colspan="8" class="p-8 text-center text-slate-400 text-xs sm:text-sm">
-                            <i class="fa-solid fa-circle-exclamation text-xl mb-1 text-pink-400 block"></i>
-                            ${currentLang === 'th' ? 'ไม่พบรายการเรื่องร้องเรียนในระบบ' : 'No complaints found'}
+                        <td colspan="8" class="p-8 text-center text-slate-400 text-xs">
+                            ไม่พบรายการเรื่องร้องเรียน
                         </td>
                     </tr>
                 `;
                 return;
             }
 
-            tbody.innerHTML = filtered.map(item => {
-                let pColor = 'bg-emerald-100 text-emerald-700';
-                if(item.priority === 'ด่วน') pColor = 'bg-amber-100 text-amber-700';
-                if(item.priority === 'ด่วนที่สุด') pColor = 'bg-rose-100 text-rose-700 animate-pulse';
+            tableBody.innerHTML = filtered.map(item => {
+                let badgeClass = 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300';
+                if(item.status === 'กำลังดำเนินการ') badgeClass = 'bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300';
+                if(item.status === 'แก้ไขเรียบร้อย') badgeClass = 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300';
+
+                let priorityColor = 'text-emerald-600';
+                if(item.priority === 'ด่วน') priorityColor = 'text-amber-500';
+                if(item.priority === 'ด่วนที่สุด') priorityColor = 'text-rose-600 font-bold';
 
                 return `
-                    <tr class="hover:bg-pink-50/50 dark:hover:bg-slate-800/50 transition-colors border-b border-pink-50 dark:border-slate-800">
-                        <td class="p-3.5 sm:p-4 font-mono font-bold text-pink-600 dark:text-pink-400 whitespace-nowrap">${item.id}</td>
-                        <td class="p-3.5 sm:p-4">
-                            <p class="font-bold text-slate-900 dark:text-white line-clamp-1">${item.subject}</p>
-                            <p class="text-[11px] text-slate-400">${item.category}</p>
+                    <tr class="hover:bg-pink-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                        <td class="p-3.5 sm:p-4 font-mono font-bold text-pink-600 dark:text-pink-400 text-xs whitespace-nowrap">${item.id}</td>
+                        <td class="p-3.5 sm:p-4 max-w-xs">
+                            <p class="font-bold text-slate-900 dark:text-white text-xs sm:text-sm line-clamp-1">${item.subject}</p>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1"><i class="fa-solid fa-building mr-1"></i> ${item.category}</p>
                         </td>
                         <td class="p-3.5 sm:p-4 whitespace-nowrap">
                             ${item.attachment ? `
-                                <button onclick="openImageModal('${item.attachment}')" class="px-2.5 py-1 bg-pink-50 text-pink-600 dark:bg-slate-800 dark:text-pink-400 rounded-lg text-xs font-semibold hover:bg-pink-100 transition-all border border-pink-200 dark:border-slate-700 shadow-sm">
+                                <button onclick="openImageModal('${item.attachment}')" class="px-2.5 py-1 bg-pink-50 dark:bg-slate-800 text-pink-600 dark:text-pink-400 rounded-lg text-[11px] font-semibold border border-pink-200 dark:border-slate-700 hover:bg-pink-100 transition-all flex items-center gap-1 shadow-sm">
                                     <i class="fa-solid fa-image"></i> ดูรูป
                                 </button>
-                            ` : `<span class="text-slate-400 text-xs">ไม่มี</span>`}
+                            ` : `<span class="text-slate-400 text-[11px]">ไม่มีรูป</span>`}
                         </td>
-                        <td class="p-3.5 sm:p-4">
-                            <div class="flex items-center gap-1.5 mb-0.5">
-                                <span class="text-[10px] font-bold px-2 py-0.2 rounded bg-purple-50 dark:bg-slate-800 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-slate-700">${item.reporterStatus || 'นักศึกษา'}</span>
-                            </div>
-                            <p class="font-semibold text-slate-800 dark:text-slate-200 text-xs">${item.fullname}</p>
-                            <p class="text-[11px] text-slate-400 font-mono">${item.contact}</p>
+                        <td class="p-3.5 sm:p-4 text-xs">
+                            <p class="font-bold text-slate-800 dark:text-slate-200 truncate max-w-[140px]">${item.fullname}</p>
+                            <p class="text-[11px] text-slate-400 truncate max-w-[140px]">${item.contact}</p>
+                            <span class="inline-block mt-0.5 px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] text-slate-600 dark:text-slate-300">${item.reporterStatus}</span>
                         </td>
+                        <td class="p-3.5 sm:p-4 text-xs whitespace-nowrap ${priorityColor}">${item.priority}</td>
                         <td class="p-3.5 sm:p-4 whitespace-nowrap">
-                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${pColor}">${item.priority}</span>
-                        </td>
-                        <td class="p-3.5 sm:p-4 whitespace-nowrap">
-                            <select onchange="updateTicketStatus('${item.id}', this.value)" class="px-2.5 py-1.5 rounded-xl border border-pink-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm cursor-pointer">
+                            <select onchange="updateTicketStatus('${item.id}', this.value)" class="px-2.5 py-1.5 rounded-xl text-[11px] font-bold ${badgeClass} border border-pink-200/50 dark:border-slate-700 cursor-pointer focus:outline-none shadow-sm">
                                 <option value="รับเรื่องแล้ว" ${item.status === 'รับเรื่องแล้ว' ? 'selected' : ''}>🟠 รับเรื่องแล้ว</option>
                                 <option value="กำลังดำเนินการ" ${item.status === 'กำลังดำเนินการ' ? 'selected' : ''}>🔵 กำลังดำเนินการ</option>
                                 <option value="แก้ไขเรียบร้อย" ${item.status === 'แก้ไขเรียบร้อย' ? 'selected' : ''}>🟢 แก้ไขเรียบร้อย</option>
                             </select>
                         </td>
                         <td class="p-3.5 sm:p-4 text-center whitespace-nowrap">
-                            <button onclick="openReplyModal('${item.id}')" class="px-3 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-600 dark:bg-slate-800 dark:text-sky-400 rounded-xl text-xs font-bold transition-all border border-sky-200 dark:border-slate-700 shadow-sm">
-                                <i class="fa-solid fa-comment-dots mr-1"></i> ตอบกลับ ${item.adminReply ? '✓' : ''}
+                            <button onclick="openReplyModal('${item.id}')" class="px-3 py-1.5 bg-sky-50 dark:bg-slate-800 text-sky-600 dark:text-sky-400 hover:bg-sky-100 rounded-xl text-xs font-semibold transition-all border border-sky-200 dark:border-slate-700 shadow-sm inline-flex items-center gap-1 transform active:scale-95">
+                                <i class="fa-solid fa-comment-dots"></i> ตอบ
                             </button>
                         </td>
                         <td class="p-3.5 sm:p-4 text-center whitespace-nowrap">
-                            <button onclick="deleteTicket('${item.id}')" class="w-8 h-8 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-slate-800 dark:text-rose-400 transition-all border border-rose-200 dark:border-slate-700 shadow-sm inline-flex items-center justify-center">
+                            <button onclick="deleteTicket('${item.id}')" class="w-8 h-8 rounded-xl bg-rose-50 dark:bg-slate-800 text-rose-500 hover:bg-rose-100 hover:text-rose-600 flex items-center justify-center transition-all border border-rose-200 dark:border-slate-700 shadow-sm mx-auto transform active:scale-95">
                                 <i class="fa-solid fa-trash-can text-xs"></i>
                             </button>
                         </td>
@@ -1614,25 +1619,25 @@
             playClickSound();
             let list = getComplaints();
             const index = list.findIndex(i => i.id === id);
-            if (index !== -1) {
+            if(index !== -1) {
                 list[index].status = newStatus;
                 saveComplaints(list);
-                showToast(currentLang === 'th' ? `อัปเดตสถานะ ${id} เป็น "${newStatus}" เรียบร้อย` : `Status updated to ${newStatus}`, 'success');
                 renderAdminDashboard();
+                showToast(currentLang === 'th' ? `อัปเดตสถานะ ${id} เรียบร้อย` : `Updated status for ${id}`, 'success');
             }
         }
 
         function openReplyModal(id) {
             playClickSound();
-            let list = getComplaints();
+            const list = getComplaints();
             const item = list.find(i => i.id === id);
-            if (!item) return;
+            if(!item) return;
 
-            document.getElementById('replyTicketTitle').innerText = `${currentLang === 'th' ? 'ตอบกลับเรื่อง:' : 'Reply to:'} ${item.subject}`;
-            document.getElementById('replyTicketSub').innerText = `${currentLang === 'th' ? 'รหัส Ticket:' : 'Ticket ID:'} ${item.id} | ${item.category}`;
+            document.getElementById('currentReplyId').value = id;
+            document.getElementById('replyTicketTitle').innerText = `${item.subject}`;
+            document.getElementById('replyTicketSub').innerText = `รหัส: ${item.id} | หน่วยงาน: ${item.category}`;
             document.getElementById('replyTicketDesc').innerText = item.description;
             document.getElementById('adminReplyText').value = item.adminReply || '';
-            document.getElementById('currentReplyId').value = item.id;
 
             const modal = document.getElementById('replyModal');
             modal.classList.remove('hidden');
@@ -1653,74 +1658,96 @@
 
             let list = getComplaints();
             const index = list.findIndex(i => i.id === id);
-            if (index !== -1) {
+            if(index !== -1) {
                 list[index].adminReply = replyText;
-                if (list[index].status === 'รับเรื่องแล้ว') {
-                    list[index].status = 'กำลังดำเนินการ';
-                }
                 saveComplaints(list);
                 closeReplyModal();
-                showToast(currentLang === 'th' ? 'บันทึกข้อความตอบกลับสำเร็จ' : 'Reply sent successfully', 'success');
                 renderAdminDashboard();
+                showToast(currentLang === 'th' ? 'บันทึกข้อความตอบกลับเรียบร้อย' : 'Reply saved successfully', 'success');
             }
         }
 
         function deleteTicket(id) {
             playClickSound();
-            if (confirm(currentLang === 'th' ? `คุณต้องการลบเรื่องร้องเรียนรหัส ${id} ใช่หรือไม่?` : `Are you sure you want to delete ${id}?`)) {
+            if(confirm(currentLang === 'th' ? `คุณต้องการลบเรื่องร้องเรียนรหัส ${id} ใช่หรือไม่?` : `Are you sure you want to delete ticket ${id}?`)) {
                 let list = getComplaints();
                 list = list.filter(i => i.id !== id);
                 saveComplaints(list);
-                showToast(currentLang === 'th' ? 'ลบรายการเรียบร้อยแล้ว' : 'Item deleted', 'info');
                 renderAdminDashboard();
+                showToast(currentLang === 'th' ? 'ลบรายการเรียบร้อยแล้ว' : 'Ticket deleted successfully', 'info');
             }
         }
 
         function generateMockData() {
             playClickSound();
-            const mock = [
+            const mockItems = [
                 {
                     id: '#LRU-9421',
                     reporterStatus: 'นักศึกษา',
                     category: 'สำนักวิทยบริการและเทคโนโลยีสารสนเทศ',
                     priority: 'ด่วน',
-                    subject: 'Wi-Fi อาคารเรียนรวม 1 หลุดบ่อยมาก',
-                    description: 'เชื่อมต่ออินเทอร์เน็ตของมหาวิทยาลัยไม่ได้เลยในช่วงบ่าย หลุดตลอดเวลา',
+                    subject: 'Wi-Fi ในหอสมุดเชื่อมต่อหลุดบ่อยมาก',
+                    description: 'ไม่สามารถใช้งานอินเทอร์เน็ตเพื่อค้นคว้างานวิจัยได้เนื่องจากสัญญาณหลุดทุกๆ 5 นาที',
                     isAnonymous: false,
-                    fullname: 'นายสมชาย ใจดี (65410123)',
-                    contact: '081-234-5678',
+                    fullname: 'นายสมชาย เรียนดี (65410123)',
+                    contact: 'somchai@lru.ac.th',
                     attachment: '',
                     status: 'กำลังดำเนินการ',
-                    adminReply: 'เจ้าหน้าที่กำลังตรวจสอบสัญญาณ Access Point ชั้น 3 ครับ',
-                    date: '22/9/2026, 09:15:00'
+                    adminReply: 'เจ้าหน้าที่ฝ่ายเทคโนโลยีสารสนเทศรับเรื่องแล้ว กำลังตรวจสอบ Access Point ชั้น 2',
+                    date: new Date().toLocaleString('th-TH')
                 },
                 {
-                    id: '#LRU-8812',
+                    id: '#LRU-8102',
                     reporterStatus: 'อาจารย์ / บุคลากร',
-                    category: 'คณะครุศาสตร์',
-                    priority: 'ปกติ',
-                    subject: 'ขอเบิกอุปกรณ์โปรเจคเตอร์ห้อง 302',
-                    description: 'สาย HDMI เชื่อมต่อโปรเจคเตอร์มีอาการภาพกระพริบ รบกวนช่วยตรวจสอบ',
+                    category: 'อาคารสถานที่และสิ่งแวดล้อม',
+                    priority: 'ด่วนที่สุด',
+                    subject: 'แอร์ในห้องบรรยาย 302 อาคารเรียนรวมเสีย',
+                    description: 'อากาศร้อนอบอ้าวมาก นักศึกษาเรียนไม่รู้เรื่องและไม่มีสมาธิ',
                     isAnonymous: false,
-                    fullname: 'อ.ดร.วิชัย รักเรียน',
-                    contact: 'vichai@lru.ac.th',
+                    fullname: 'ผศ.ดร.วิชาญ บริหาร',
+                    contact: '042-835224',
                     attachment: '',
                     status: 'รับเรื่องแล้ว',
                     adminReply: '',
-                    date: '21/9/2026, 14:30:00'
+                    date: new Date().toLocaleString('th-TH')
+                },
+                {
+                    id: '#LRU-5514',
+                    reporterStatus: 'นักศึกษา',
+                    category: 'สำนักส่งเสริมวิชาการและงานทะเบียน',
+                    priority: 'ปกติ',
+                    subject: 'สอบถามกำหนดการเพิ่ม-ถอนรายวิชาภาคเรียนนี้',
+                    description: 'ต้องการทราบกำหนดการที่แน่นอนเพื่อไม่ให้พ้นสภาพหรือลงทะเบียนล่าช้า',
+                    isAnonymous: true,
+                    fullname: 'ไม่ระบุตัวตน (Anonymous)',
+                    contact: '-',
+                    attachment: '',
+                    status: 'แก้ไขเรียบร้อย',
+                    adminReply: 'ได้ประกาศกำหนดการลงทะเบียนผ่านหน้าเว็บไซต์สำนักทะเบียนแล้วครับ',
+                    date: new Date().toLocaleString('th-TH')
                 }
             ];
-            saveComplaints(mock);
-            showToast(currentLang === 'th' ? 'สร้างข้อมูลตัวอย่างเรียบร้อย' : 'Mock data generated', 'success');
+
+            let list = getComplaints();
+            // รวม mock เข้าไปโดยไม่ให้ซ้ำ
+            mockItems.forEach(m => {
+                if(!list.some(existing => existing.id === m.id)) {
+                    list.unshift(m);
+                    addMyTicketId(m.id);
+                }
+            });
+
+            saveComplaints(list);
             renderAdminDashboard();
+            showToast(currentLang === 'th' ? 'สร้างข้อมูลตัวอย่างสำเร็จ' : 'Mock data generated successfully', 'success');
         }
 
         function clearAllData() {
             playClickSound();
-            if (confirm(currentLang === 'th' ? 'คุณต้องการล้างข้อมูลเรื่องร้องเรียนทั้งหมดในระบบใช่หรือไม่?' : 'Clear all system data?')) {
+            if(confirm(currentLang === 'th' ? 'คุณต้องการล้างข้อมูลเรื่องร้องเรียนทั้งหมดในระบบใช่หรือไม่?' : 'Are you sure you want to clear all system complaints?')) {
                 localStorage.removeItem(STORAGE_KEY);
-                showToast(currentLang === 'th' ? 'ล้างข้อมูลทั้งหมดแล้ว' : 'All data cleared', 'info');
                 renderAdminDashboard();
+                showToast(currentLang === 'th' ? 'ล้างข้อมูลทั้งหมดในระบบเรียบร้อย' : 'All system data cleared', 'info');
             }
         }
     </script>
